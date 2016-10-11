@@ -71,12 +71,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\Evgeny\OneDrive\Roguelike\roguelike\3rd_party\libtcod-1.5.1\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Evgeny\OneDrive\Roguelike\roguelike\3rd_party\libtcod-1.5.1\lib;$(LibraryPath)</LibraryPath>
-    <SourcePath>C:\Users\Evgeny\OneDrive\Roguelike\roguelike\3rd_party\libtcod-1.5.1\src;$(SourcePath)</SourcePath>
+    <IncludePath>C:\Users\polik_000\Documents\roguelike\3rd_party\libtcod-1.5.1\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\polik_000\Documents\roguelike\3rd_party\libtcod-1.5.1\lib;$(LibraryPath)</LibraryPath>
+    <SourcePath>C:\Users\polik_000\Documents\roguelike\3rd_party\libtcod-1.5.1\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\Users\polik_000\Documents\roguelike\3rd_party\libtcod-1.5.1\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\polik_000\Documents\roguelike\3rd_party\libtcod-1.5.1\lib;$(LibraryPath)</LibraryPath>
+    <SourcePath>C:\Users\polik_000\Documents\roguelike\3rd_party\libtcod-1.5.1\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -110,6 +113,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\polik_000\Documents\roguelike\3rd_party\libtcod-1.5.1\lib;C:\Users\polik_000\Documents\roguelike\3rd_party\libtcod-1.5.1;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libtcod-VS.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
