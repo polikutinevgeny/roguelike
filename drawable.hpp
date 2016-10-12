@@ -31,6 +31,8 @@ public:
 
     virtual void Draw() = 0;
 
+    virtual void Move(int dx, int dy) = 0;
+
     virtual CollisionType CheckCollision(Drawable& other) = 0;
     virtual CollisionType CheckCollision(Knight& other) = 0;
     virtual CollisionType CheckCollision(Princess& other) = 0;
@@ -38,24 +40,19 @@ public:
     virtual CollisionType CheckCollision(Wall& other) = 0;
     virtual CollisionType CheckCollision(Floor& other) = 0;
 
+    inline int get_x() const { return x_; };
+    inline int get_y() const { return y_; };
+
 protected:
     int x_;
     int y_;
 
 };
 
-class Moveable : public Drawable {
+class Character : public Drawable {
 
 public:
-    Moveable(int x, int y) : Drawable(x, y) {};
-    virtual void Move(int dx, int dy) = 0;
-
-};
-
-class Character : public Moveable {
-
-public:
-    Character(int x, int y) : Moveable(x, y) {};
+    Character(int x, int y) : Drawable(x, y) {};
 
 };
 
@@ -93,6 +90,11 @@ public:
     CollisionType CheckCollision (Monster& other) override;
     CollisionType CheckCollision (Wall& other) override;
     CollisionType CheckCollision (Floor& other) override;
+
+    inline int get_speed() const { return speed_; };
+
+protected:
+    int speed_; //In % from knight speed
 
 };
 
@@ -137,7 +139,7 @@ public:
 class Zombie : public Monster {
 
 public:
-    Zombie(int x, int y, int damage) : Monster(x, y, damage) {};
+    Zombie(int x, int y, int damage);
 
     void Draw() override;
 
@@ -150,7 +152,7 @@ public:
 class Dragon : public Monster {
 
 public:
-    Dragon(int x, int y, int damage) : Monster(x, y, damage) {};
+    Dragon(int x, int y, int damage);
 
     void Draw() override;
 
@@ -167,6 +169,8 @@ public:
 
     void Draw() override;
 
+    void Move(int dx, int dy) override;
+
     CollisionType CheckCollision (Drawable& other) override;
     CollisionType CheckCollision (Knight& other) override;
     CollisionType CheckCollision (Princess& other) override;
@@ -182,6 +186,8 @@ public:
     Floor(int x, int y) : Drawable(x, y) {};
 
     void Draw() override;
+
+    void Move(int dx, int dy) override;
 
     CollisionType CheckCollision (Drawable& other) override;
     CollisionType CheckCollision (Knight& other) override;

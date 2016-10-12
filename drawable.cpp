@@ -44,7 +44,8 @@ void Princess::Draw() {
 }
 
 void Princess::Move(int dx, int dy) {
-    //Princess could move. In the future. Maybe.
+    x_ += dx;
+    y_ += dy;
 }
 
 CollisionType Princess::CheckCollision (Drawable & other) {
@@ -71,6 +72,10 @@ CollisionType Princess::CheckCollision (Floor & other) {
     return NO_COLLISION;
 }
 
+Zombie::Zombie(int x, int y, int damage) : Monster(x, y, damage) {
+    speed_ = 30;
+}
+
 void Zombie::Draw() {
     TCODConsole::root->putChar(x_, y_, 'Z');
 }
@@ -79,6 +84,10 @@ void Zombie::Move(int dx, int dy) {
 }
 
 void Zombie::Hit() {
+}
+
+Dragon::Dragon(int x, int y, int damage) : Monster(x, y, damage) {
+    speed_ = 60;
 }
 
 void Dragon::Draw() {
@@ -93,6 +102,11 @@ void Dragon::Hit() {
 
 void Wall::Draw() {
     TCODConsole::root->putChar(x_, y_, '#');
+}
+
+void Wall::Move(int dx, int dy) {
+    x_ += dx;
+    y_ += dy;
 }
 
 CollisionType Wall::CheckCollision (Drawable & other) {
@@ -121,6 +135,11 @@ CollisionType Wall::CheckCollision (Floor & other) {
 
 void Floor::Draw() {
     TCODConsole::root->putChar(x_, y_, ' ');
+}
+
+void Floor::Move(int dx, int dy) {
+    x_ += dx;
+    y_ += dy;
 }
 
 CollisionType Floor::CheckCollision (Drawable & other) {

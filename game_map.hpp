@@ -15,6 +15,8 @@ public:
 
     void PutPrincess (int x, int y);
 
+    void MoveMonsters();
+
     void Render ();
 
 protected:
@@ -23,8 +25,6 @@ protected:
 
     Knight* player_;
     Princess* princess_;
-
-    std::vector<std::vector<Monster*>> enemies_;
 
     std::vector<std::vector<Drawable*>> objects_;
 
