@@ -5,7 +5,7 @@
 
 //#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
-rogue::Engine rogue::engine;
+rogue::Engine rogue::engine(80, 50);
 
 int main() {
     while (!TCODConsole::isWindowClosed()) {

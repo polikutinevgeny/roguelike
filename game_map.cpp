@@ -39,9 +39,6 @@ private:
     int last_y_;
 };
 
-//int dx[4] = { 1, -1, 0, 0 };
-//int dy[4] = { 0, 0, 1, -1 };
-
 Map::Map(int width, int height) : width(width), height(height) {
     tiles_ = new Tile[width * height];
     map = new TCODMap(width, height);
@@ -66,7 +63,7 @@ bool Map::CanWalk(int x, int y) {
         return false;
     }
     for (auto a : engine.actors) {
-        if (a->x == x && a->y == y) {
+        if (a->x == x && a->y == y && a->blocks) {
             return false;
         }
     }
@@ -111,10 +108,10 @@ void Map::ComputeFOV() {
 void Map::AddMonster(int x, int y) {
     TCODRandom* rng = TCODRandom::getInstance();
     if (rng->getInt(0, 100) < 80) {
-        engine.actors.push_back(new Actor(x, y, 'Z', TCODColor::desaturatedGreen, "zombie"));
+        engine.actors.push_back(new Zombie(x, y, 'Z', TCODColor::desaturatedGreen, "zombie"));
     }
     else {
-        engine.actors.push_back(new Actor(x, y, 'D', TCODColor::red, "dragon"));
+        engine.actors.push_back(new Dragon(x, y, 'D', TCODColor::red, "dragon"));
     }
 }
 

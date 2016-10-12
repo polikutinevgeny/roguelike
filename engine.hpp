@@ -15,17 +15,22 @@ enum GameStatus {
 
 class Engine {
 public:
-    Engine();
+    Engine(int width, int height);
     ~Engine();
 
     void Update();
     void Render();
 
+    void Lose();
+    void Win();
+
     std::list<Actor*> actors;
-    Actor* player;
+    Player* player;
     Map* map;
 
     int fov_radius;
+    int width;
+    int height;
 
 private:
     bool compute_fov_;
