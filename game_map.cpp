@@ -1,109 +1,153 @@
+#include "libtcod.hpp"
 #include "game_map.hpp"
-#include <random>
-#include <ctime>
-#include <queue>
+#include "engine.hpp"
+#include "drawable.hpp"
 
 namespace rogue {
 
-int dx[4] = { 1, -1, 0, 0 };
-int dy[4] = { 0, 0, 1, -1 };
+static const int MAX_ROOM_SIZE = 12;
+static const int MIN_ROOM_SIZE = 6;
+static const int MAX_ROOM_MONSTERS = 3;
 
-Game::Game (int height, int width) : width_ (width), height_ (height), objects_ (height, std::vector<Drawable*> (width)) {
-    std::srand(std::time(0));
-    for (int i = 0; i < objects_.size (); ++i) {
-        for (int j = 0; j < objects_[i].size(); ++j) {
-            if (i == 0 || j == 0 || i == height - 1 || j == width - 1) {
-                objects_[i][j] = new Wall(i, j);
+class BSPListener : public ITCODBspCallback {
+public:
+    BSPListener(Map& map) : map_(map), room_num_(0) {};
+
+    bool visitNode(TCODBsp* node, void *userData) override {
+        if (node->isLeaf()) {
+            TCODRandom* rng = TCODRandom::getInstance();
+            int w = rng->getInt(MIN_ROOM_SIZE, node->w - 2);
+            int h = rng->getInt(MIN_ROOM_SIZE, node->h - 2);
+            int x = rng->getInt(node->x + 1, node->x + node->w - w - 1);
+            int y = rng->getInt(node->y + 1, node->y + node->h - h - 1);
+            map_.CreateRoom(room_num_ == 0, x, y, x + w - 1, y + h - 1);
+            if (room_num_ != 0) {
+                map_.Dig(last_x_, last_y_, x + w / 2, last_y_);
+                map_.Dig(x + w / 2, last_y_, x + w / 2, y + h / 2);
             }
-            else {
-                objects_[i][j] = new Floor(i, j);
+            last_x_ = x + w / 2;
+            last_y_ = y + h / 2;
+            room_num_++;
+        }
+        return true;
+    }
+
+private:
+    Map& map_;
+    int room_num_;
+    int last_x_;
+    int last_y_;
+};
+
+//int dx[4] = { 1, -1, 0, 0 };
+//int dy[4] = { 0, 0, 1, -1 };
+
+Map::Map(int width, int height) : width(width), height(height) {
+    tiles_ = new Tile[width * height];
+    map = new TCODMap(width, height);
+    TCODBsp bsp(0, 0, width, height);
+    bsp.splitRecursive(NULL, 8, MIN_ROOM_SIZE, MAX_ROOM_SIZE, 1.5F, 1.5F);
+    BSPListener listener(*this);
+    bsp.traverseInvertedLevelOrder(&listener, NULL);
+}
+
+Map::~Map() {
+    delete[] tiles_;
+    delete map;
+}
+
+bool Map::IsWall(int x, int y) {
+    return /*x < 0 || y < 0 || x >= width || y >= height || !tiles_[x + y * width].walkable*/
+        !map->isWalkable(x, y);
+}
+
+bool Map::CanWalk(int x, int y) {
+    if (IsWall(x, y)) {
+        return false;
+    }
+    for (auto a : engine.actors) {
+        if (a->x == x && a->y == y) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void Map::Render() {
+    static const TCODColor wall(0, 0, 100);
+    static const TCODColor ground(50, 50, 150);
+    static const TCODColor light_wall(130, 110, 50);
+    static const TCODColor light_ground(200, 180, 50);
+    for (int x = 0; x < width; ++x) {
+        for (int y = 0; y < height; ++y) {
+            if (IsInFOV(x, y)) {
+                TCODConsole::root->setCharBackground(x, y,
+                    IsWall(x, y) ? light_wall: light_ground);
             }
-            if (std::rand() % 101 == 0) {
-                Drawable* temp = new Zombie(i, j, 10);
-                if (temp->CheckCollision(*objects_[i][j]) == NO_COLLISION) {
-                    objects_[i][j] = temp;
-                }
-                else {
-                    delete temp;
-                }
+            else if (IsExplored(x, y)){
+                TCODConsole::root->setCharBackground(x, y,
+                    IsWall(x, y) ? wall : ground);
             }
         }
     }
-    player_ = NULL;
-    princess_ = NULL;
 }
 
-Game::~Game () {
-    for (std::vector<Drawable*> i : objects_) {
-        for (Drawable* j : i) {
-            delete j;
+bool Map::IsInFOV(int x, int y) {
+    if (map->isInFov(x, y)) {
+        tiles_[x + y * width].explored = true;
+        return true;
+    }
+    return false;
+}
+
+bool Map::IsExplored(int x, int y) {
+    return tiles_[x + y * width].explored;
+}
+
+void Map::ComputeFOV() {
+    map->computeFov(engine.player->x, engine.player->y, engine.fov_radius);
+}
+
+void Map::AddMonster(int x, int y) {
+    TCODRandom* rng = TCODRandom::getInstance();
+    if (rng->getInt(0, 100) < 80) {
+        engine.actors.push_back(new Actor(x, y, 'Z', TCODColor::desaturatedGreen, "zombie"));
+    }
+    else {
+        engine.actors.push_back(new Actor(x, y, 'D', TCODColor::red, "dragon"));
+    }
+}
+
+void Map::Dig(int x1, int y1, int x2, int y2) {
+    if (x2 < x1) {
+        std::swap(x2, x1);
+    }
+    if (y2 < y1) {
+        std::swap(y2, y1);
+    }
+    for (int x = x1; x <= x2; ++x) {
+        for (int y = y1; y <= y2; ++y) {
+            map->setProperties(x, y, true, true);
         }
     }
-    delete player_;
-    delete princess_;
 }
 
-void Game::PutPlayer (int x, int y) {
-    delete objects_[x][y];
-    player_ = new Knight (x, y, 40);
-    objects_[x][y] = player_;
-}
-
-void Game::MovePlayer (int dx, int dy) {
-    int nx = player_->get_x() + dx;
-    int ny = player_->get_y() + dy;
-    if (player_->CheckCollision(*objects_[nx][ny]) == NO_COLLISION) {
-        Drawable* temp = objects_[nx][ny];
-        objects_[nx][ny] = player_;
-        objects_[player_->get_x()][player_->get_y()] = temp;
-        player_->Move(dx, dy);
-        temp->Move(-dx, -dy);
+void Map::CreateRoom(bool first, int x1, int y1, int x2, int y2) {
+    Dig(x1, y1, x2, y2);
+    if (first) {
+        engine.player->x = (x1 + x2) / 2;
+        engine.player->y = (y1 + y2) / 2;
     }
-}
-
-void Game::PutPrincess (int x, int y) {
-    delete objects_[x][y];
-    princess_ = new Princess(x, y);
-    objects_[x][y] = princess_;
-}
-
-void Game::MoveMonsters() {
-    std::queue<std::pair<int, int>> q;
-    q.push(std::make_pair(player_->get_x(), player_->get_y()));
-    std::vector<std::vector<bool>> visited(height_, std::vector<bool>(width_, false));
-    std::vector<std::vector<int>> distance(height_, std::vector<int>(width_, 0));
-    visited[player_->get_x()][player_->get_y()] = true;
-    distance[player_->get_x()][player_->get_y()] = 0;
-    while (!q.empty()) {
-        std::pair<int, int> cur = q.front();
-        q.pop();
-        for (int i = 0; i < 4; ++i) {
-            int nx = cur.first + dx[i];
-            int ny = cur.second + dy[i];
-            if (nx < 0 || ny < 0 || nx >= width_ || ny >= height_) {
-                continue;
+    else {
+        TCODRandom* rng = TCODRandom::getInstance();
+        int num = rng->getInt(0, MAX_ROOM_MONSTERS);
+        while (num > 0) {
+            int x = rng->getInt(x1, x2);
+            int y = rng->getInt(y1, y2);
+            if (CanWalk(x, y)) {
+                AddMonster(x, y);
             }
-            CollisionType c = objects_[nx][ny]->CheckCollision(*player_);
-            if (visited[nx][ny] || distance[cur.first][cur.second] > 11 || c == OBJECT_COLLISION) {
-                continue;
-            }
-            visited[nx][ny] = true;
-            q.push(std::make_pair(nx, ny));
-            distance[nx][ny] = distance[cur.first][cur.second] + 1;
-            if (c == FIGHT_COLLISION) {
-                std::swap(objects_[cur.first][cur.second], objects_[nx][ny]);
-                objects_[cur.first][cur.second]->Move(nx - cur.first, ny - cur.second);
-                objects_[nx][ny]->Move(cur.first - nx, cur.second - ny);
-            }
-        }
-
-    }
-}
-
-void rogue::Game::Render () {
-    for (std::vector<Drawable*> i : objects_) {
-        for (Drawable* j : i) {
-            j->Draw ();
+            num--;
         }
     }
 }

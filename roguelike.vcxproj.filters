@@ -24,12 +24,18 @@
     <ClCompile Include="game_map.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="engine.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="drawable.hpp">
       <Filter>Файлы исходного кода</Filter>
     </ClInclude>
     <ClInclude Include="game_map.hpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClInclude>
+    <ClInclude Include="engine.hpp">
       <Filter>Файлы исходного кода</Filter>
     </ClInclude>
   </ItemGroup>

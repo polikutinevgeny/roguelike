@@ -4,30 +4,36 @@
 
 namespace rogue {
 
-class Game {
+struct Tile {
+    Tile() : explored(false) {};
+    bool explored;
+};
 
+class Map {
 public:
-    Game (int height, int width);
-    ~Game ();
+    Map(int width, int height);
+    ~Map();
 
-    void PutPlayer (int x, int y);
-    void MovePlayer (int dx, int dy);
+    bool IsWall(int x, int y);
+    bool CanWalk(int x, int y);
+    void Render();
 
-    void PutPrincess (int x, int y);
+    bool IsInFOV(int x, int y);
+    bool IsExplored(int x, int y);
+    void ComputeFOV();
 
-    void MoveMonsters();
+    void AddMonster(int x, int y);
 
-    void Render ();
+    int width, height;
 
 protected:
-    int width_;
-    int height_;
+    Tile *tiles_;
+    friend class BSPListener;
 
-    Knight* player_;
-    Princess* princess_;
+    TCODMap* map;
 
-    std::vector<std::vector<Drawable*>> objects_;
-
+    void Dig(int x1, int y1, int x2, int y2);
+    void CreateRoom(bool first, int x1, int y1, int x2, int y2);
 };
 
 }
