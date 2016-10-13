@@ -2,31 +2,25 @@
 #include "game_map.hpp"
 #include "engine.hpp"
 #include "actors.hpp"
+#include "bsp_tree.hpp"
 
 namespace rogue {
 
 static int last_x1, last_y1, last_x2, last_y2;
 
-static const int MAX_ROOM_SIZE = 12;
-static const int MIN_ROOM_SIZE = 6;
 static const int MAX_ROOM_MONSTERS = 3;
+static const int MIN_ROOM_VERT_SIZE = 12;
+static const int MIN_ROOM_HORIZ_SIZE = 6;
 
-static int mult[4][8] = {
-    {1, 0, 0, -1, -1, 0, 0, 1},
-    {0, 1, -1, 0, 0, -1, 1, 0},
-    {0, 1, 1, 0, 0, -1, -1, 0},
-    {1, 0, 0, 1, -1, 0, 0, -1},
-};
-
-class BSPListener : public ITCODBspCallback {
+class BSPCallback : public BSPTreeCallbackInterface {
 public:
-    BSPListener(Map& map) : map_(map), room_num_(0) {};
+    BSPCallback(Map& map) : map_(map), room_num_(0) {};
 
-    bool visitNode(TCODBsp* node, void *userData) override {
-        if (node->isLeaf()) {
+    virtual void VisitNode(BSPTree* node) override {
+        if (node->IsLeaf()) {
             TCODRandom* rng = TCODRandom::getInstance();
-            int w = rng->getInt(MIN_ROOM_SIZE, node->w - 2);
-            int h = rng->getInt(MIN_ROOM_SIZE, node->h - 2);
+            int w = rng->getInt(MIN_ROOM_HORIZ_SIZE, node->w - 2);
+            int h = rng->getInt(MIN_ROOM_VERT_SIZE, node->h - 2);
             int x = rng->getInt(node->x + 1, node->x + node->w - w - 1);
             int y = rng->getInt(node->y + 1, node->y + node->h - h - 1);
             map_.CreateRoom(room_num_ == 0, x, y, x + w - 1, y + h - 1);
@@ -38,9 +32,7 @@ public:
             last_y_ = y + h / 2;
             room_num_++;
         }
-        return true;
     }
-
 private:
     Map& map_;
     int room_num_;
@@ -48,12 +40,19 @@ private:
     int last_y_;
 };
 
+static int mult[4][8] = {
+    {1, 0, 0, -1, -1, 0, 0, 1},
+    {0, 1, -1, 0, 0, -1, 1, 0},
+    {0, 1, 1, 0, 0, -1, -1, 0},
+    {1, 0, 0, 1, -1, 0, 0, -1},
+};
+
 Map::Map(int width, int height) : width(width), height(height), princess_placed_(false) {
     map_ = new Tile[width * height];
-    TCODBsp bsp(1, 1, width - 1, height - 1);
-    bsp.splitRecursive(NULL, 8, MIN_ROOM_SIZE, MAX_ROOM_SIZE, 1.5F, 1.5F);
-    BSPListener listener(*this);
-    bsp.traverseInvertedLevelOrder(&listener, NULL);
+    BSPTree bsp(1, 1, width - 1, height - 1);
+    bsp.SplitRecursive(8, MIN_ROOM_HORIZ_SIZE, MIN_ROOM_VERT_SIZE, 1.5, 1.5);
+    BSPCallback callback(*this);
+    bsp.TraverseLevelOrder(&callback);
     PutPrincess(last_x1, last_y1, last_x2, last_y2);
 }
 
@@ -113,7 +112,7 @@ void Map::ComputeFOV() {
         map_[i].fov = false;
     }
     for (int oct = 0; oct < 8; ++oct) {
-        cast_light(
+        CastLight(
             engine.player->x, engine.player->y, 1, 1.0, 0.0, engine.fov_radius, 
             engine.fov_radius * engine.fov_radius, mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct]);
     }
@@ -187,7 +186,7 @@ void Map::PutPrincess(int x1, int y1, int x2, int y2) {
     }
 }
 
-void Map::cast_light(int cx, int cy, int row, double start, double end, int radius, int r2,
+void Map::CastLight(int cx, int cy, int row, double start, double end, int radius, int r2,
     int xx, int xy, int yx, int yy) {
     double new_start = 0.0f;
     if (start < end) {
@@ -199,10 +198,10 @@ void Map::cast_light(int cx, int cy, int row, double start, double end, int radi
         bool blocked = false;
         while (dx <= 0) {
             dx++;
-            int X = cx + dx * xx + dy * xy;
-            int Y = cy + dx * yx + dy * yy;
-            if (X < width && Y < height && X >= 0 && Y >= 0) {
-                int offset = X + Y * width;
+            int x = cx + dx * xx + dy * xy;
+            int y = cy + dx * yx + dy * yy;
+            if (x < width && y < height && x >= 0 && y >= 0) {
+                int offset = x + y * width;
                 double l_slope = (dx - 0.5) / (dy + 0.5);
                 double r_slope = (dx + 0.5) / (dy - 0.5);
                 if (start < r_slope) {
@@ -227,7 +226,7 @@ void Map::cast_light(int cx, int cy, int row, double start, double end, int radi
                 else {
                     if (!map_[offset].transparent && j < radius) {
                         blocked = true;
-                        cast_light(cx, cy, j + 1, start, l_slope, radius, r2, xx, xy, yx, yy);
+                        CastLight(cx, cy, j + 1, start, l_slope, radius, r2, xx, xy, yx, yy);
                         new_start = r_slope;
                     }
                 }

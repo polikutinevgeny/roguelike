@@ -31,11 +31,11 @@ public:
 
 protected:
     Tile *map_;
-    friend class BSPListener;
+    friend class BSPCallback;
 
     bool princess_placed_;
 
-    void cast_light(int cx, int cy, int row, double start, double end, int radius, int r2,
+    void CastLight(int cx, int cy, int row, double start, double end, int radius, int r2,
         int xx, int xy, int yx, int yy);
 
     void Dig(int x1, int y1, int x2, int y2);

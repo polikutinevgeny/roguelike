@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="actors.cpp" />
+    <ClCompile Include="bsp_tree.cpp" />
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="game_map.cpp" />
     <ClCompile Include="gui.cpp" />
@@ -160,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="actors.hpp" />
+    <ClInclude Include="bsp_tree.hpp" />
     <ClInclude Include="engine.hpp" />
     <ClInclude Include="game_map.hpp" />
     <ClInclude Include="gui.hpp" />

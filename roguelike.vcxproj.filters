@@ -30,6 +30,9 @@
     <ClCompile Include="gui.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="bsp_tree.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game_map.hpp">
@@ -42,6 +45,9 @@
       <Filter>Файлы исходного кода</Filter>
     </ClInclude>
     <ClInclude Include="gui.hpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClInclude>
+    <ClInclude Include="bsp_tree.hpp">
       <Filter>Файлы исходного кода</Filter>
     </ClInclude>
   </ItemGroup>
