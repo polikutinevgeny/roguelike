@@ -8,6 +8,7 @@
 rogue::Engine rogue::engine(100, 70);
 
 int main() {
+    //_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF); _ASSERTE(_CrtCheckMemory());
     while (!TCODConsole::isWindowClosed()) {
         rogue::engine.Update();
         rogue::engine.Render();

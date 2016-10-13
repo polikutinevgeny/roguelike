@@ -31,7 +31,7 @@ public:
 
 protected:
     Tile *map_;
-    friend class BSPCallback;
+    friend class BSPListener;
 
     bool princess_placed_;
 

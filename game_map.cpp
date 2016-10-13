@@ -12,11 +12,11 @@ static const int MAX_ROOM_MONSTERS = 3;
 static const int MIN_ROOM_VERT_SIZE = 12;
 static const int MIN_ROOM_HORIZ_SIZE = 6;
 
-class BSPCallback : public BSPTreeCallbackInterface {
+class BSPListener : public BSPTreeCallbackInterface {
 public:
-    BSPCallback(Map& map) : map_(map), room_num_(0) {};
+    BSPListener(Map& map) : map_(map), room_num_(0) {};
 
-    virtual void VisitNode(BSPTree* node) override {
+    virtual void VisitNode(BSPTree const* node) override {
         if (node->IsLeaf()) {
             TCODRandom* rng = TCODRandom::getInstance();
             int w = rng->getInt(MIN_ROOM_HORIZ_SIZE, node->w - 2);
@@ -49,11 +49,10 @@ static int mult[4][8] = {
 
 Map::Map(int width, int height) : width(width), height(height), princess_placed_(false) {
     map_ = new Tile[width * height];
-    BSPTree bsp(1, 1, width - 1, height - 1);
+    BSPTree bsp(1, 1, width - 3, height - 3);
     bsp.SplitRecursive(8, MIN_ROOM_HORIZ_SIZE, MIN_ROOM_VERT_SIZE, 1.5, 1.5);
-    BSPCallback callback(*this);
+    BSPListener callback(*this);
     bsp.TraverseLevelOrder(&callback);
-    PutPrincess(last_x1, last_y1, last_x2, last_y2);
 }
 
 Map::~Map() {

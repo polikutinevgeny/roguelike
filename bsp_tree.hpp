@@ -7,7 +7,7 @@ class BSPTree;
 
 class BSPTreeCallbackInterface {
 public:
-    virtual void VisitNode(BSPTree* node) = 0;
+    virtual void VisitNode(BSPTree const* node) = 0;
 };
 
 class BSPTree {
@@ -20,7 +20,7 @@ public:
 
     bool IsLeaf() const;
 
-    bool TraverseLevelOrder(BSPTreeCallbackInterface* callback);
+    void TraverseLevelOrder(BSPTreeCallbackInterface* callback) const;
 
     int x, y, w, h;
     int position;
@@ -28,19 +28,13 @@ public:
     int level;
 
 protected:
-    BSPTree(BSPTree *father, bool left);
+    BSPTree(BSPTree const* father, bool left);
 
-    void AddSon(BSPTree *data);
-
-    void RemoveSons();
     void SplitOnce(bool horizontal, int position);
 
-    BSPTree* GetLeft() const;
-    BSPTree* GetRight() const;
-
-    BSPTree* next_;
+    BSPTree* left_;
+    BSPTree* right_;
     BSPTree* father_;
-    BSPTree* sons_;
 };
 
 }

@@ -5,42 +5,21 @@
 namespace rogue {
 
 BSPTree::BSPTree(int x, int y, int w, int h) :
-    next_(NULL), father_(NULL), sons_(NULL), x(x), y(y), w(w), h(h), level(0) {
+    left_(NULL), father_(NULL), right_(NULL), x(x), y(y), w(w), h(h), level(0) {
 }
 
 BSPTree::~BSPTree() {
-    RemoveSons();
-}
-
-void BSPTree::AddSon(BSPTree* data) {
-    data->father_ = this;
-    BSPTree* last_son = sons_;
-    while (last_son && last_son->next_)
-        last_son = last_son->next_;
-    if (last_son) {
-        last_son->next_ = data;
-    }
-    else {
-        sons_ = data;
-    }
-}
-
-void BSPTree::RemoveSons() {
-    BSPTree* node = sons_;
-    while (node) {
-        BSPTree* next_node = node->next_;
-        node->RemoveSons();
-        delete node;
-        node = next_node;
-    }
-    sons_ = NULL;
+    delete left_;
+    delete right_;
 }
 
 void BSPTree::SplitOnce(bool horizontal, int position) {
     this->horizontal = horizontal;
     this->position = position;
-    AddSon(new BSPTree(this, true));
-    AddSon(new BSPTree(this, false));
+    left_ = new BSPTree(this, true);
+    right_ = new BSPTree(this, false);
+    left_->father_ = this;
+    right_->father_ = this;
 }
 
 void BSPTree::SplitRecursive(int nb, int min_h_size, int min_v_size, double max_h_ratio, double max_v_ratio) {
@@ -66,37 +45,29 @@ void BSPTree::SplitRecursive(int nb, int min_h_size, int min_v_size, double max_
         position = randomizer->getInt(x + min_h_size, x + w - min_h_size);
     }
     SplitOnce(horiz, position);
-    GetLeft()->SplitRecursive(nb - 1, min_h_size, min_v_size, max_h_ratio, max_v_ratio);
-    GetRight()->SplitRecursive(nb - 1, min_h_size, min_v_size, max_h_ratio, max_v_ratio);
-}
-
-BSPTree* BSPTree::GetLeft() const {
-    return sons_;
-}
-BSPTree* BSPTree::GetRight() const {
-    return sons_ ? sons_->next_ : NULL;
+    left_->SplitRecursive(nb - 1, min_h_size, min_v_size, max_h_ratio, max_v_ratio);
+    right_->SplitRecursive(nb - 1, min_h_size, min_v_size, max_h_ratio, max_v_ratio);
 }
 
 bool BSPTree::IsLeaf() const {
-    return sons_ == NULL;
+    return !(left_ || right_);
 }
 
-bool BSPTree::TraverseLevelOrder(BSPTreeCallbackInterface* callback) {
-    std::stack<BSPTree*> stack;
+void BSPTree::TraverseLevelOrder(BSPTreeCallbackInterface* callback) const {
+    std::stack<const BSPTree*> stack;
     stack.push(this);
     while (!stack.empty()) {
-        BSPTree *node = stack.top();
+        BSPTree const* node = stack.top();
         stack.pop();
-        if (node->GetLeft()) 
-            stack.push(node->GetLeft());
-        if (node->GetRight()) 
-            stack.push(node->GetRight());
+        if (node->left_) 
+            stack.push(node->left_);
+        if (node->right_) 
+            stack.push(node->right_);
         callback->VisitNode(node);
     }
-    return true;
 }
 
-BSPTree::BSPTree(BSPTree* father, bool left) : next_(NULL), father_(NULL), sons_(NULL) {
+BSPTree::BSPTree(BSPTree const* father, bool left) : left_(NULL), father_(NULL), right_(NULL) {
     if (father->horizontal) {
         x = father->x;
         w = father->w;
