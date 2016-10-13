@@ -11,6 +11,13 @@ static const int MAX_ROOM_SIZE = 12;
 static const int MIN_ROOM_SIZE = 6;
 static const int MAX_ROOM_MONSTERS = 3;
 
+static int mult[4][8] = {
+    {1, 0, 0, -1, -1, 0, 0, 1},
+    {0, 1, -1, 0, 0, -1, 1, 0},
+    {0, 1, 1, 0, 0, -1, -1, 0},
+    {1, 0, 0, 1, -1, 0, 0, -1},
+};
+
 class BSPListener : public ITCODBspCallback {
 public:
     BSPListener(Map& map) : map_(map), room_num_(0) {};
@@ -42,9 +49,8 @@ private:
 };
 
 Map::Map(int width, int height) : width(width), height(height), princess_placed_(false) {
-    tiles_ = new Tile[width * height];
-    map = new TCODMap(width, height);
-    TCODBsp bsp(0, 0, width, height);
+    map_ = new Tile[width * height];
+    TCODBsp bsp(1, 1, width - 1, height - 1);
     bsp.splitRecursive(NULL, 8, MIN_ROOM_SIZE, MAX_ROOM_SIZE, 1.5F, 1.5F);
     BSPListener listener(*this);
     bsp.traverseInvertedLevelOrder(&listener, NULL);
@@ -52,12 +58,11 @@ Map::Map(int width, int height) : width(width), height(height), princess_placed_
 }
 
 Map::~Map() {
-    delete[] tiles_;
-    delete map;
+    delete[] map_;
 }
 
 bool Map::IsWall(int x, int y) {
-    return !map->isWalkable(x, y);
+    return x < 0 || y < 0 || x >= width || y >= height || !map_[x + y * width].walkable;
 }
 
 bool Map::CanWalk(int x, int y) {
@@ -81,9 +86,9 @@ void Map::Render() {
         for (int y = 0; y < height; ++y) {
             if (IsInFOV(x, y)) {
                 TCODConsole::root->setCharBackground(x, y,
-                    IsWall(x, y) ? light_wall: light_ground);
+                    IsWall(x, y) ? light_wall : light_ground);
             }
-            else if (IsExplored(x, y)){
+            else if (IsExplored(x, y)) {
                 TCODConsole::root->setCharBackground(x, y,
                     IsWall(x, y) ? wall : ground);
             }
@@ -92,19 +97,27 @@ void Map::Render() {
 }
 
 bool Map::IsInFOV(int x, int y) {
-    if (map->isInFov(x, y)) {
-        tiles_[x + y * width].explored = true;
+    if (map_[x + y * width].fov) {
+        map_[x + y * width].explored = true;
         return true;
     }
     return false;
 }
 
 bool Map::IsExplored(int x, int y) {
-    return tiles_[x + y * width].explored;
+    return map_[x + y * width].explored;
 }
 
 void Map::ComputeFOV() {
-    map->computeFov(engine.player->x, engine.player->y, engine.fov_radius);
+    for (int i = 0; i < width * height; ++i) {
+        map_[i].fov = false;
+    }
+    for (int oct = 0; oct < 8; ++oct) {
+        cast_light(
+            engine.player->x, engine.player->y, 1, 1.0, 0.0, engine.fov_radius, 
+            engine.fov_radius * engine.fov_radius, mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct]);
+    }
+    map_[engine.player->x + engine.player->y * width].fov = 1;
 }
 
 void Map::AddMonster(int x, int y) {
@@ -126,7 +139,8 @@ void Map::Dig(int x1, int y1, int x2, int y2) {
     }
     for (int x = x1; x <= x2; ++x) {
         for (int y = y1; y <= y2; ++y) {
-            map->setProperties(x, y, true, true);
+            map_[x + y * width].transparent = true;
+            map_[x + y * width].walkable = true;
         }
     }
 }
@@ -169,6 +183,58 @@ void Map::PutPrincess(int x1, int y1, int x2, int y2) {
                 engine.princess->y = y;
                 return;
             }
+        }
+    }
+}
+
+void Map::cast_light(int cx, int cy, int row, double start, double end, int radius, int r2,
+    int xx, int xy, int yx, int yy) {
+    double new_start = 0.0f;
+    if (start < end) {
+        return;
+    }
+    for (int j = row; j < radius + 1; j++) {
+        int dx = -j - 1;
+        int dy = -j;
+        bool blocked = false;
+        while (dx <= 0) {
+            dx++;
+            int X = cx + dx * xx + dy * xy;
+            int Y = cy + dx * yx + dy * yy;
+            if (X < width && Y < height && X >= 0 && Y >= 0) {
+                int offset = X + Y * width;
+                double l_slope = (dx - 0.5) / (dy + 0.5);
+                double r_slope = (dx + 0.5) / (dy - 0.5);
+                if (start < r_slope) {
+                    continue;
+                }
+                else if (end > l_slope) {
+                    break;
+                }
+                if (dx * dx + dy * dy <= r2) {
+                    map_[offset].fov = 1;
+                }
+                if (blocked) {
+                    if (!map_[offset].transparent) {
+                        new_start = r_slope;
+                        continue;
+                    }
+                    else {
+                        blocked = false;
+                        start = new_start;
+                    }
+                }
+                else {
+                    if (!map_[offset].transparent && j < radius) {
+                        blocked = true;
+                        cast_light(cx, cy, j + 1, start, l_slope, radius, r2, xx, xy, yx, yy);
+                        new_start = r_slope;
+                    }
+                }
+            }
+        }
+        if (blocked) {
+            break;
         }
     }
 }

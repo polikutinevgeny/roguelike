@@ -5,8 +5,11 @@
 namespace rogue {
 
 struct Tile {
-    Tile() : explored(false) {};
+    Tile() : explored(false), walkable(false), transparent(false), fov(false) {};
     bool explored;
+    bool walkable;
+    bool fov;
+    bool transparent;
 };
 
 class Map {
@@ -27,12 +30,13 @@ public:
     int width, height;
 
 protected:
-    Tile *tiles_;
+    Tile *map_;
     friend class BSPListener;
 
     bool princess_placed_;
 
-    TCODMap* map;
+    void cast_light(int cx, int cy, int row, double start, double end, int radius, int r2,
+        int xx, int xy, int yx, int yy);
 
     void Dig(int x1, int y1, int x2, int y2);
     void CreateRoom(bool first, int x1, int y1, int x2, int y2);
