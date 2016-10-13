@@ -21,6 +21,7 @@ public:
     const char* name;
 
     int hp;
+    int max_hp;
     int damage;
 
     bool blocks;
@@ -40,6 +41,12 @@ public:
 class Monster : public Actor {
 public:
     Monster(int x, int y, int face, const TCODColor& color, const char* name);
+    virtual ~Monster() = 0; //we need class to be abstract
+
+    void Update() override;
+
+    bool MoveOrAttack(int x, int y) override;
+
 protected:
     int move_count_;
 };
@@ -48,16 +55,19 @@ class Zombie : public Monster {
 public:
     Zombie(int x, int y, int face, const TCODColor& color, const char* name);
 
-    void Update() override;
-
-    bool MoveOrAttack(int x, int y) override;
-
     void GetDamage(int dmg) override;
 };
 
 class Dragon : public Monster {
 public:
     Dragon(int x, int y, int face, const TCODColor& color, const char* name);
+
+    void GetDamage(int dmg) override;
+};
+
+class Princess : public Actor {
+public:
+    Princess(int x, int y, int face, const TCODColor& color, const char* name);
 
     void Update() override;
 

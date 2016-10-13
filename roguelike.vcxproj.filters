@@ -18,24 +18,30 @@
     <ClCompile Include="Main.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
-    <ClCompile Include="drawable.cpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClCompile>
     <ClCompile Include="game_map.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
     <ClCompile Include="engine.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="actors.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
+    <ClCompile Include="gui.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="drawable.hpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClInclude>
     <ClInclude Include="game_map.hpp">
       <Filter>Файлы исходного кода</Filter>
     </ClInclude>
     <ClInclude Include="engine.hpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClInclude>
+    <ClInclude Include="actors.hpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClInclude>
+    <ClInclude Include="gui.hpp">
       <Filter>Файлы исходного кода</Filter>
     </ClInclude>
   </ItemGroup>

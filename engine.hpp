@@ -2,6 +2,7 @@
 #include <list>
 #include <string>
 #include "game_map.hpp"
+#include "gui.hpp"
 
 namespace rogue {
 
@@ -26,11 +27,14 @@ public:
 
     std::list<Actor*> actors;
     Player* player;
+    Princess* princess;
     Map* map;
 
     int fov_radius;
     int width;
     int height;
+
+    Gui* gui;
 
 private:
     bool compute_fov_;

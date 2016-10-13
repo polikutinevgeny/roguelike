@@ -1,9 +1,11 @@
 #include "libtcod.hpp"
 #include "game_map.hpp"
 #include "engine.hpp"
-#include "drawable.hpp"
+#include "actors.hpp"
 
 namespace rogue {
+
+static int last_x1, last_y1, last_x2, last_y2;
 
 static const int MAX_ROOM_SIZE = 12;
 static const int MIN_ROOM_SIZE = 6;
@@ -39,13 +41,14 @@ private:
     int last_y_;
 };
 
-Map::Map(int width, int height) : width(width), height(height) {
+Map::Map(int width, int height) : width(width), height(height), princess_placed_(false) {
     tiles_ = new Tile[width * height];
     map = new TCODMap(width, height);
     TCODBsp bsp(0, 0, width, height);
     bsp.splitRecursive(NULL, 8, MIN_ROOM_SIZE, MAX_ROOM_SIZE, 1.5F, 1.5F);
     BSPListener listener(*this);
     bsp.traverseInvertedLevelOrder(&listener, NULL);
+    PutPrincess(last_x1, last_y1, last_x2, last_y2);
 }
 
 Map::~Map() {
@@ -54,8 +57,7 @@ Map::~Map() {
 }
 
 bool Map::IsWall(int x, int y) {
-    return /*x < 0 || y < 0 || x >= width || y >= height || !tiles_[x + y * width].walkable*/
-        !map->isWalkable(x, y);
+    return !map->isWalkable(x, y);
 }
 
 bool Map::CanWalk(int x, int y) {
@@ -131,6 +133,10 @@ void Map::Dig(int x1, int y1, int x2, int y2) {
 
 void Map::CreateRoom(bool first, int x1, int y1, int x2, int y2) {
     Dig(x1, y1, x2, y2);
+    last_x1 = x1;
+    last_x2 = x2;
+    last_y1 = y1;
+    last_y2 = y2;
     if (first) {
         engine.player->x = (x1 + x2) / 2;
         engine.player->y = (y1 + y2) / 2;
@@ -145,6 +151,24 @@ void Map::CreateRoom(bool first, int x1, int y1, int x2, int y2) {
                 AddMonster(x, y);
             }
             num--;
+        }
+    }
+}
+
+void Map::PutPrincess(int x1, int y1, int x2, int y2) {
+    if (x2 < x1) {
+        std::swap(x2, x1);
+    }
+    if (y2 < y1) {
+        std::swap(y2, y1);
+    }
+    for (int x = x1; x <= x2; ++x) {
+        for (int y = y1; y <= y2; ++y) {
+            if (CanWalk(x, y)) {
+                engine.princess->x = x;
+                engine.princess->y = y;
+                return;
+            }
         }
     }
 }

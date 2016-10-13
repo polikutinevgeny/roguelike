@@ -1,7 +1,7 @@
 #include "libtcod.hpp"
 #include "game_map.hpp"
 #include "engine.hpp"
-#include "drawable.hpp"
+#include "actors.hpp"
 
 //#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 

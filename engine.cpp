@@ -1,14 +1,19 @@
 #include "libtcod.hpp"
-#include "drawable.hpp"
+#include "actors.hpp"
 #include "game_map.hpp"
 #include "engine.hpp"
 
-rogue::Engine::Engine(int width, int height) : 
+namespace rogue {
+
+rogue::Engine::Engine(int width, int height) :
     fov_radius(10), compute_fov_(true), status_(STARTUP), width(width), height(height) {
     TCODConsole::initRoot(width, height, "Rogue-like game", false);
     player = new Player(40, 25, 'K', TCODColor::white, "player");
+    princess = new Princess(40, 30, 'P', TCODColor::brass, "princess");
     actors.push_back(player);
-    map = new Map(80, 45);
+    actors.push_back(princess);
+    map = new Map(80, 43);
+    gui = new Gui();
 }
 
 rogue::Engine::~Engine() {
@@ -16,6 +21,7 @@ rogue::Engine::~Engine() {
         delete a;
     }
     delete map;
+    delete gui;
 }
 
 void rogue::Engine::Update() {
@@ -25,7 +31,7 @@ void rogue::Engine::Update() {
     }
     TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS, &key, NULL);
     if (status_ == VICTORY || status_ == DEFEAT) {
-        if (key.vk != TCODK_NONE) {
+        if (key.vk == TCODK_ENTER) {
             exit(0);
         }
         return;
@@ -34,16 +40,16 @@ void rogue::Engine::Update() {
     int dy = 0;
     status_ = IDLE;
     switch (key.vk) {
-        case TCODK_UP: 
+        case TCODK_UP:
             dy = -1;
             break;
-        case TCODK_DOWN: 
+        case TCODK_DOWN:
             dy = 1;
             break;
-        case TCODK_LEFT: 
+        case TCODK_LEFT:
             dx = -1;
             break;
-        case TCODK_RIGHT: 
+        case TCODK_RIGHT:
             dx = 1;
             break;
         default:break;
@@ -66,26 +72,26 @@ void rogue::Engine::Update() {
 void rogue::Engine::Render() {
     TCODConsole::root->clear();
     if (status_ == VICTORY) {
-        TCODConsole::root->print(1, height - 2, "YOU WON");
+        TCODConsole::root->print(width / 2 - 4, height / 2, "YOU WON");
         return;
     }
     if (status_ == DEFEAT) {
-        TCODConsole::root->print(1, height - 2, "YOU LOST");
+        TCODConsole::root->print(width / 2 - 4, height / 2, "YOU LOST");
         return;
     }
     map->Render();
-    for (auto a : actors) {
-        if (map->IsInFOV(a->x, a->y) && a != player && a->blocks) {
-            a->Render();
-        }
-    }
     for (auto a : actors) {
         if (map->IsInFOV(a->x, a->y) && !a->blocks) {
             a->Render();
         }
     }
+    for (auto a : actors) {
+        if (map->IsInFOV(a->x, a->y) && a != player && a->blocks) {
+            a->Render();
+        }
+    }
     player->Render();
-    TCODConsole::root->print(1, height - 2, "HP : %d", player->hp);
+    gui->Render();
 }
 
 void rogue::Engine::Lose() {
@@ -94,4 +100,6 @@ void rogue::Engine::Lose() {
 
 void rogue::Engine::Win() {
     status_ = VICTORY;
+}
+
 }

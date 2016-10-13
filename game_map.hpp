@@ -1,5 +1,5 @@
 #pragma once
-#include "drawable.hpp"
+#include "actors.hpp"
 #include <vector>
 
 namespace rogue {
@@ -30,10 +30,15 @@ protected:
     Tile *tiles_;
     friend class BSPListener;
 
+    bool princess_placed_;
+
     TCODMap* map;
 
     void Dig(int x1, int y1, int x2, int y2);
     void CreateRoom(bool first, int x1, int y1, int x2, int y2);
+
+    void PutPrincess(int x1, int y1, int x2, int y2);
+
 };
 
 }
