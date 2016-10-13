@@ -13,7 +13,7 @@ public:
 
     virtual bool MoveOrAttack(int x, int y) = 0;
 
-    virtual void GetDamage(int dmg) = 0;
+    virtual void RecieveDamage(int dmg) = 0;
 
     int x, y;
     int face;
@@ -35,7 +35,7 @@ public:
 
     bool MoveOrAttack(int x, int y) override;
 
-    void GetDamage(int dmg) override;
+    void RecieveDamage(int dmg) override;
 };
 
 class Monster : public Actor {
@@ -55,14 +55,14 @@ class Zombie : public Monster {
 public:
     Zombie(int x, int y, int face, const TCODColor& color, const char* name);
 
-    void GetDamage(int dmg) override;
+    void RecieveDamage(int dmg) override;
 };
 
 class Dragon : public Monster {
 public:
     Dragon(int x, int y, int face, const TCODColor& color, const char* name);
 
-    void GetDamage(int dmg) override;
+    void RecieveDamage(int dmg) override;
 };
 
 class Princess : public Actor {
@@ -73,7 +73,7 @@ public:
 
     bool MoveOrAttack(int x, int y) override;
 
-    void GetDamage(int dmg) override;
+    void RecieveDamage(int dmg) override;
 };
 
 }

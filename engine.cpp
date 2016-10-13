@@ -9,10 +9,10 @@ rogue::Engine::Engine(int width, int height) :
     fov_radius(10), compute_fov_(true), status_(STARTUP), width(width), height(height) {
     TCODConsole::initRoot(width, height, "Rogue-like game", false);
     player = new Player(40, 25, 'K', TCODColor::white, "player");
-    princess = new Princess(40, 30, 'P', TCODColor::brass, "princess");
+    princess = new Princess(40, 30, 'P', TCODColor::darkerGrey, "princess");
     actors.push_back(player);
     actors.push_back(princess);
-    map = new Map(80, 43);
+    map = new Map(width, height - 7);
     gui = new Gui();
 }
 
@@ -55,7 +55,7 @@ void rogue::Engine::Update() {
         default:break;
     }
     if (dx || dy) {
-        if (player->MoveOrAttack(player->x + dx, player->y + dy)) {
+        if (player->MoveOrAttack(player->x + dx, player->y + dy) && status_ != VICTORY) {
             status_ = NEW_TURN;
             map->ComputeFOV();
         }
@@ -66,17 +66,18 @@ void rogue::Engine::Update() {
                 a->Update();
             }
         }
+        printf("Princess dx: %d, dy %d\n", princess->x - player->x, princess->y - player->y);
     }
 }
 
 void rogue::Engine::Render() {
     TCODConsole::root->clear();
     if (status_ == VICTORY) {
-        TCODConsole::root->print(width / 2 - 4, height / 2, "YOU WON");
+        TCODConsole::root->printEx(width / 2, height / 2, TCOD_BKGND_NONE, TCOD_CENTER, "YOU WON");
         return;
     }
     if (status_ == DEFEAT) {
-        TCODConsole::root->print(width / 2 - 4, height / 2, "YOU LOST");
+        TCODConsole::root->printEx(width / 2, height / 2, TCOD_BKGND_NONE, TCOD_CENTER, "YOU LOST");
         return;
     }
     map->Render();
@@ -86,11 +87,10 @@ void rogue::Engine::Render() {
         }
     }
     for (auto a : actors) {
-        if (map->IsInFOV(a->x, a->y) && a != player && a->blocks) {
+        if (map->IsInFOV(a->x, a->y) && a->blocks) {
             a->Render();
         }
     }
-    player->Render();
     gui->Render();
 }
 

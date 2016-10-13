@@ -39,7 +39,7 @@ bool Player::MoveOrAttack(int x, int y) {
     }
     for (auto a : engine.actors) {
         if (a->x == x && a->y == y && a->blocks) {
-            a->GetDamage(this->damage);
+            a->RecieveDamage(this->damage);
             return true;
         }
     }
@@ -48,7 +48,7 @@ bool Player::MoveOrAttack(int x, int y) {
     return true;
 }
 
-void Player::GetDamage(int dmg) {
+void Player::RecieveDamage(int dmg) {
     if (hp - dmg <= 0) {
         engine.Lose();
     }
@@ -62,7 +62,7 @@ Zombie::Zombie(int x, int y, int face, const TCODColor & color, const char * nam
     damage = BASE_ZOMBIE_DMG;
 }
 
-void Zombie::GetDamage(int dmg) {
+void Zombie::RecieveDamage(int dmg) {
     hp = hp - dmg > 0 ? hp - dmg : 0;
     if (hp == 0) {
         blocks = false;
@@ -77,7 +77,7 @@ Dragon::Dragon(int x, int y, int face, const TCODColor & color, const char * nam
     damage = BASE_DRAGON_DMG;
 }
 
-void Dragon::GetDamage(int dmg) {
+void Dragon::RecieveDamage(int dmg) {
     hp = hp - dmg > 0 ? hp - dmg : 0;
     if (hp == 0) {
         blocks = false;
@@ -126,7 +126,7 @@ bool Monster::MoveOrAttack(int x, int y) {
         }
     }
     else {
-        engine.player->GetDamage(this->damage);
+        engine.player->RecieveDamage(this->damage);
     }
     return true;
 }
@@ -142,7 +142,7 @@ bool Princess::MoveOrAttack(int x, int y) {
     return false;
 }
 
-void Princess::GetDamage(int dmg) {
+void Princess::RecieveDamage(int dmg) {
     engine.Win();
 }
 
