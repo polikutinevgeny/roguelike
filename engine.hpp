@@ -34,10 +34,10 @@ public:
     int width;
     int height;
 
-    Gui* gui;
-
 private:
     bool compute_fov_;
+
+    Gui* gui_;
 
     GameStatus status_;
 

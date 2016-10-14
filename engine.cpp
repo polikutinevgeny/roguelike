@@ -12,8 +12,8 @@ rogue::Engine::Engine(int width, int height) :
     princess = new Princess(40, 30, 'P', TCODColor::darkerGrey, "princess");
     actors.push_back(player);
     actors.push_back(princess);
-    map = new Map(width, height - 7);
-    gui = new Gui();
+    map = new Map(width, height - GUI_PANEL_HEIGHT);
+    gui_ = new Gui();
 }
 
 rogue::Engine::~Engine() {
@@ -21,7 +21,7 @@ rogue::Engine::~Engine() {
         delete a;
     }
     delete map;
-    delete gui;
+    delete gui_;
 }
 
 void rogue::Engine::Update() {
@@ -91,7 +91,7 @@ void rogue::Engine::Render() {
             a->Render();
         }
     }
-    gui->Render();
+    gui_->Render();
 }
 
 void rogue::Engine::Lose() {

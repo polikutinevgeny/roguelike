@@ -20,14 +20,11 @@ public:
 
     bool IsLeaf() const;
 
-    void TraverseLevelOrder(BSPTreeCallbackInterface* callback) const;
+    void TraverseLevelOrder(BSPTreeCallbackInterface& callback) const;
 
     int x, y, w, h;
-    int position;
-    bool horizontal;
-    int level;
 
-protected:
+private:
     BSPTree(BSPTree const* father, bool left);
 
     void SplitOnce(bool horizontal, int position);
@@ -35,6 +32,10 @@ protected:
     BSPTree* left_;
     BSPTree* right_;
     BSPTree* father_;
+
+    int position_;
+    bool horizontal_;
+    int level_;
 };
 
 }

@@ -40,17 +40,13 @@ private:
     int last_y_;
 };
 
-Map::Map(int width, int height) : width(width), height(height), princess_placed_(false) {
-    map_ = new Tile[width * height];
+Map::Map(int width, int height) : width(width), height(height) {
+    map_.resize(width * height);
     BSPTree bsp(1, 1, width - 3, height - 3);
     bsp.SplitRecursive(8, MIN_ROOM_HORIZ_SIZE, MIN_ROOM_VERT_SIZE, 1.5, 1.5);
     BSPListener callback(*this);
-    bsp.TraverseLevelOrder(&callback);
+    bsp.TraverseLevelOrder(callback);
     PutPrincess(last_x1, last_y1, last_x2, last_y2);
-}
-
-Map::~Map() {
-    delete[] map_;
 }
 
 bool Map::IsWall(int x, int y) {
@@ -118,7 +114,7 @@ void Map::ComputeFOV() {
     map_[engine.player->x + engine.player->y * width].fov = 1;
 }
 
-void Map::AddMonster(int x, int y) {
+void Map::PutMonster(int x, int y) {
     TCODRandom* rng = TCODRandom::getInstance();
     if (rng->getInt(0, 100) < 80) {
         engine.actors.push_back(new Zombie(x, y, 'Z', TCODColor::desaturatedGreen, "zombie"));
@@ -160,7 +156,7 @@ void Map::CreateRoom(bool first, int x1, int y1, int x2, int y2) {
             int x = rng->getInt(x1, x2);
             int y = rng->getInt(y1, y2);
             if (CanWalk(x, y)) {
-                AddMonster(x, y);
+                PutMonster(x, y);
             }
             num--;
         }

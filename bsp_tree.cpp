@@ -5,7 +5,7 @@
 namespace rogue {
 
 BSPTree::BSPTree(int x, int y, int w, int h) :
-    left_(NULL), father_(NULL), right_(NULL), x(x), y(y), w(w), h(h), level(0) {
+    left_(NULL), father_(NULL), right_(NULL), x(x), y(y), w(w), h(h), level_(0) {
 }
 
 BSPTree::~BSPTree() {
@@ -14,8 +14,8 @@ BSPTree::~BSPTree() {
 }
 
 void BSPTree::SplitOnce(bool horizontal, int position) {
-    this->horizontal = horizontal;
-    this->position = position;
+    this->horizontal_ = horizontal;
+    this->position_ = position;
     TCODRandom* rng = TCODRandom::getInstance();
     if (rng->getInt(1, 2) == 1) {
         left_ = new BSPTree(this, true);
@@ -60,8 +60,8 @@ bool BSPTree::IsLeaf() const {
     return !(left_ || right_);
 }
 
-void BSPTree::TraverseLevelOrder(BSPTreeCallbackInterface* callback) const {
-    std::stack<const BSPTree*> stack;
+void BSPTree::TraverseLevelOrder(BSPTreeCallbackInterface& callback) const {
+    std::stack<BSPTree const *> stack;
     stack.push(this);
     while (!stack.empty()) {
         BSPTree const* node = stack.top();
@@ -70,24 +70,24 @@ void BSPTree::TraverseLevelOrder(BSPTreeCallbackInterface* callback) const {
             stack.push(node->left_);
         if (node->right_) 
             stack.push(node->right_);
-        callback->VisitNode(node);
+        callback.VisitNode(node);
     }
 }
 
 BSPTree::BSPTree(BSPTree const* father, bool left) : left_(NULL), father_(NULL), right_(NULL) {
-    if (father->horizontal) {
+    if (father->horizontal_) {
         x = father->x;
         w = father->w;
-        y = left ? father->y : father->position;
-        h = left ? father->position - y : father->y + father->h - father->position;
+        y = left ? father->y : father->position_;
+        h = left ? father->position_ - y : father->y + father->h - father->position_;
     }
     else {
         y = father->y;
         h = father->h;
-        x = left ? father->x : father->position;
-        w = left ? father->position - x : father->x + father->w - father->position;
+        x = left ? father->x : father->position_;
+        w = left ? father->position_ - x : father->x + father->w - father->position_;
     }
-    level = father->level + 1;
+    level_ = father->level_ + 1;
 }
 
 }

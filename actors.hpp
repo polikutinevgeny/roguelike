@@ -3,6 +3,8 @@
 
 namespace rogue {
 
+const int GUI_PANEL_HEIGHT = 7;
+
 class Actor {
 public:
     Actor(int x, int y, int face, const TCODColor& color, const char* name);
