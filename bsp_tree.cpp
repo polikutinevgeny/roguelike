@@ -16,8 +16,15 @@ BSPTree::~BSPTree() {
 void BSPTree::SplitOnce(bool horizontal, int position) {
     this->horizontal = horizontal;
     this->position = position;
-    left_ = new BSPTree(this, true);
-    right_ = new BSPTree(this, false);
+    TCODRandom* rng = TCODRandom::getInstance();
+    if (rng->getInt(1, 2) == 1) {
+        left_ = new BSPTree(this, true);
+        right_ = new BSPTree(this, false);
+    }
+    else {
+        right_ = new BSPTree(this, true);
+        left_ = new BSPTree(this, false);
+    }
     left_->father_ = this;
     right_->father_ = this;
 }

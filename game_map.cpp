@@ -9,8 +9,8 @@ namespace rogue {
 static int last_x1, last_y1, last_x2, last_y2;
 
 static const int MAX_ROOM_MONSTERS = 3;
-static const int MIN_ROOM_VERT_SIZE = 12;
-static const int MIN_ROOM_HORIZ_SIZE = 6;
+static const int MIN_ROOM_VERT_SIZE = 6;
+static const int MIN_ROOM_HORIZ_SIZE = 12;
 
 class BSPListener : public BSPTreeCallbackInterface {
 public:
@@ -40,19 +40,13 @@ private:
     int last_y_;
 };
 
-static int mult[4][8] = {
-    {1, 0, 0, -1, -1, 0, 0, 1},
-    {0, 1, -1, 0, 0, -1, 1, 0},
-    {0, 1, 1, 0, 0, -1, -1, 0},
-    {1, 0, 0, 1, -1, 0, 0, -1},
-};
-
 Map::Map(int width, int height) : width(width), height(height), princess_placed_(false) {
     map_ = new Tile[width * height];
     BSPTree bsp(1, 1, width - 3, height - 3);
     bsp.SplitRecursive(8, MIN_ROOM_HORIZ_SIZE, MIN_ROOM_VERT_SIZE, 1.5, 1.5);
     BSPListener callback(*this);
     bsp.TraverseLevelOrder(&callback);
+    PutPrincess(last_x1, last_y1, last_x2, last_y2);
 }
 
 Map::~Map() {
@@ -107,6 +101,12 @@ bool Map::IsExplored(int x, int y) {
 }
 
 void Map::ComputeFOV() {
+    static int mult[4][8] = {
+        { 1, 0, 0, -1, -1, 0, 0, 1 },
+        { 0, 1, -1, 0, 0, -1, 1, 0 },
+        { 0, 1, 1, 0, 0, -1, -1, 0 },
+        { 1, 0, 0, 1, -1, 0, 0, -1 },
+    };
     for (int i = 0; i < width * height; ++i) {
         map_[i].fov = false;
     }

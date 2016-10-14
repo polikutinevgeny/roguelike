@@ -157,7 +157,7 @@
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="game_map.cpp" />
     <ClCompile Include="gui.cpp" />
-    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="actors.hpp" />
