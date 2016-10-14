@@ -1,19 +1,19 @@
 #include "libtcod.hpp"
-#include "actors.hpp"
-#include "game_map.hpp"
 #include "engine.hpp"
 
 namespace rogue {
 
+const int GUI_PANEL_HEIGHT = 7;
+
 rogue::Engine::Engine(int width, int height) :
     fov_radius(10), compute_fov_(true), status_(STARTUP), width(width), height(height) {
     TCODConsole::initRoot(width, height, "Rogue-like game", false);
-    player = new Player(40, 25, 'K', TCODColor::white, "player");
-    princess = new Princess(40, 30, 'P', TCODColor::darkerGrey, "princess");
+    player = new Player(40, 25, 'K', TCODColor::white, "player", *this);
+    princess = new Princess(40, 30, 'P', TCODColor::darkerGrey, "princess", *this);
     actors.push_back(player);
     actors.push_back(princess);
-    map = new Map(width, height - GUI_PANEL_HEIGHT);
-    gui_ = new Gui();
+    map = new Map(width, height - GUI_PANEL_HEIGHT, *this, *this);
+    gui_ = new Gui(width, GUI_PANEL_HEIGHT, width, height, *this);
 }
 
 rogue::Engine::~Engine() {
@@ -96,6 +96,34 @@ void rogue::Engine::Render() {
 
 void rogue::Engine::Lose() {
     status_ = DEFEAT;
+}
+
+bool Engine::IsWall(int x, int y) {
+    return map->IsWall(x, y);
+}
+
+bool Engine::CanWalk(int x, int y) {
+    return map->CanWalk(x, y);
+}
+
+bool Engine::IsInFOV(int x, int y) {
+    return map->IsInFOV(x, y);
+}
+
+Actor& Engine::GetPlayer() {
+    return *player;
+}
+
+Actor& Engine::GetPrincess() {
+    return *princess;
+}
+
+std::list<Actor*>& Engine::GetActors() {
+    return actors;
+}
+
+int Engine::GetFOVRadius() {
+    return fov_radius;
 }
 
 void rogue::Engine::Win() {

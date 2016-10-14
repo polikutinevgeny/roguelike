@@ -1,12 +1,13 @@
 #include "gui.hpp"
-#include "engine.hpp"
 
 namespace rogue {
 
 static const int BAR_WIDTH = 20;
 
-Gui::Gui() {
-    con_ = new TCODConsole(engine.width, GUI_PANEL_HEIGHT);
+Gui::Gui(int gui_width, int gui_height, int main_width, int main_height, GuiCallbackInterface& engine) :
+    engine_(engine), gui_width_(gui_width), gui_height_(gui_height), 
+    main_width_(main_width), main_height_(main_height) {
+    con_ = new TCODConsole(gui_width, gui_height);
 }
 
 Gui::~Gui() {
@@ -16,8 +17,8 @@ Gui::~Gui() {
 void Gui::Render() {
     con_->setDefaultBackground(TCODColor::black);
     con_->clear();
-    RenderBar(1, 1, BAR_WIDTH, "HP", engine.player->hp, engine.player->max_hp, TCODColor::lightRed, TCODColor::darkerRed);
-    TCODConsole::blit(con_, 0, 0, engine.width, GUI_PANEL_HEIGHT, TCODConsole::root, 0, engine.height - GUI_PANEL_HEIGHT);
+    RenderBar(1, 1, BAR_WIDTH, "HP", engine_.GetPlayer().hp, engine_.GetPlayer().max_hp, TCODColor::lightRed, TCODColor::darkerRed);
+    TCODConsole::blit(con_, 0, 0, main_width_, gui_height_, TCODConsole::root, 0, main_height_ - gui_height_);
 }
 
 void Gui::RenderBar(int x, int y, int width, const char * name, int value, int max_value, const TCODColor & bar_color, const TCODColor & back_color) {

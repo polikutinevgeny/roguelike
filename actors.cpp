@@ -1,7 +1,7 @@
 #include "actors.hpp"
-#include "engine.hpp"
 #include "libtcod.hpp"
 #include <stdio.h>
+#include <cmath>
 
 namespace rogue {
 
@@ -13,8 +13,9 @@ static const int BASE_ZOMBIE_DMG = 5;
 static const int BASE_DRAGON_HP = 40;
 static const int BASE_DRAGON_DMG = 10;
 
-Actor::Actor(int x, int y, int face, const TCODColor & color, const char * name) :
-    x(x), y(y), face(face), color(color), name(name), hp(-1), max_hp(-1), damage(0), blocks(true) {
+Actor::Actor(int x, int y, int face, const TCODColor & color, const char * name,
+    ActorCallbackInterface& engine) : x(x), y(y), face(face), color(color), name(name), hp(-1), 
+    max_hp(-1), damage(0), blocks(true), engine_(engine) {
 }
 
 void Actor::Render() {
@@ -22,8 +23,8 @@ void Actor::Render() {
     TCODConsole::root->setCharForeground(x, y, color);
 }
 
-Player::Player(int x, int y, int face, const TCODColor& color, const char* name) :
-    Actor(x, y, face, color, name) {
+Player::Player(int x, int y, int face, const TCODColor& color, const char* name,
+    ActorCallbackInterface& engine) : Actor(x, y, face, color, name, engine) {
     hp = BASE_PLAYER_HP;
     max_hp = BASE_PLAYER_HP;
     damage = BASE_PLAYER_DMG;
@@ -34,10 +35,10 @@ void Player::Update() {
 }
 
 bool Player::MoveOrAttack(int x, int y) {
-    if (engine.map->IsWall(x, y)) {
+    if (engine_.IsWall(x, y)) {
         return false;
     }
-    for (auto a : engine.actors) {
+    for (auto a : engine_.GetActors()) {
         if (a->x == x && a->y == y && a->blocks) {
             a->RecieveDamage(this->damage);
             return true;
@@ -50,13 +51,13 @@ bool Player::MoveOrAttack(int x, int y) {
 
 void Player::RecieveDamage(int dmg) {
     if (hp - dmg <= 0) {
-        engine.Lose();
+        engine_.Lose();
     }
     hp -= dmg;
 }
 
-Zombie::Zombie(int x, int y, int face, const TCODColor & color, const char * name) :
-    Monster(x, y, face, color, name) {
+Zombie::Zombie(int x, int y, int face, const TCODColor & color, const char * name,
+    ActorCallbackInterface& engine) : Monster(x, y, face, color, name, engine) {
     hp = BASE_ZOMBIE_HP;
     max_hp = BASE_ZOMBIE_HP;
     damage = BASE_ZOMBIE_DMG;
@@ -70,8 +71,8 @@ void Zombie::RecieveDamage(int dmg) {
     }
 }
 
-Dragon::Dragon(int x, int y, int face, const TCODColor & color, const char * name) :
-    Monster(x, y, face, color, name) {
+Dragon::Dragon(int x, int y, int face, const TCODColor & color, const char * name,
+    ActorCallbackInterface& engine) : Monster(x, y, face, color, name, engine) {
     hp = BASE_DRAGON_HP;
     max_hp = BASE_DRAGON_HP;
     damage = BASE_DRAGON_DMG;
@@ -85,8 +86,8 @@ void Dragon::RecieveDamage(int dmg) {
     }
 }
 
-Monster::Monster(int x, int y, int face, const TCODColor & color, const char * name) :
-    Actor(x, y, face, color, name) {}
+Monster::Monster(int x, int y, int face, const TCODColor & color, const char * name,
+    ActorCallbackInterface& engine) : Actor(x, y, face, color, name, engine), move_count_(0) {}
 
 Monster::~Monster() {}
 
@@ -94,14 +95,14 @@ void Monster::Update() {
     if (hp == 0) {
         return;
     }
-    if (engine.map->IsInFOV(x, y)) {
+    if (engine_.IsInFOV(x, y)) {
         move_count_ = TRACKING_TURNS;
     }
     else {
         move_count_--;
     }
     if (move_count_ > 0) {
-        MoveOrAttack(engine.player->x, engine.player->y);
+        MoveOrAttack(engine_.GetPlayer().x, engine_.GetPlayer().y);
     }
 }
 
@@ -114,25 +115,25 @@ bool Monster::MoveOrAttack(int x, int y) {
     if (d > 1) {
         dx = (int) std::round(dx / d);
         dy = (int) std::round(dy / d);
-        if (engine.map->CanWalk(this->x + dx, this->y + dy)) {
+        if (engine_.CanWalk(this->x + dx, this->y + dy)) {
             this->x += dx;
             this->y += dy;
         }
-        else if (engine.map->CanWalk(this->x + sdx, this->y)) {
+        else if (engine_.CanWalk(this->x + sdx, this->y)) {
             this->x += sdx;
         }
-        else if (engine.map->CanWalk(this->x, this->y + sdy)) {
+        else if (engine_.CanWalk(this->x, this->y + sdy)) {
             this->y += sdy;
         }
     }
     else {
-        engine.player->RecieveDamage(this->damage);
+        engine_.GetPlayer().RecieveDamage(this->damage);
     }
     return true;
 }
 
-Princess::Princess(int x, int y, int face, const TCODColor & color, const char * name) : 
-    Actor(x, y, face, color, name) {}
+Princess::Princess(int x, int y, int face, const TCODColor & color, const char * name,
+    ActorCallbackInterface& engine) : Actor(x, y, face, color, name, engine) {}
 
 void Princess::Update() {
     //No AI for princess
@@ -143,7 +144,7 @@ bool Princess::MoveOrAttack(int x, int y) {
 }
 
 void Princess::RecieveDamage(int dmg) {
-    engine.Win();
+    engine_.Win();
 }
 
 }

@@ -1,8 +1,16 @@
 #pragma once
-#include "actors.hpp"
 #include <vector>
+#include "actors.hpp"
 
 namespace rogue {
+
+class MapCallbackInterface {
+public:
+    virtual Actor& GetPlayer() = 0;
+    virtual Actor& GetPrincess() = 0;
+    virtual std::list<Actor*>& GetActors() = 0;
+    virtual int GetFOVRadius() = 0;
+};
 
 struct Tile {
     Tile() : explored(false), walkable(false), transparent(false), fov(false) {};
@@ -14,7 +22,7 @@ struct Tile {
 
 class Map {
 public:
-    Map(int width, int height);
+    Map(int width, int height, MapCallbackInterface& engine, ActorCallbackInterface& actor_callback);
 
     bool IsWall(int x, int y);
     bool CanWalk(int x, int y);
@@ -27,6 +35,9 @@ public:
     int width, height;
 
 private:
+    MapCallbackInterface& engine_;
+    ActorCallbackInterface& actor_callback_;
+
     std::vector<Tile> map_;
     friend class BSPListener;
 

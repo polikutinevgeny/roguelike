@@ -1,7 +1,5 @@
 #include "libtcod.hpp"
 #include "game_map.hpp"
-#include "engine.hpp"
-#include "actors.hpp"
 #include "bsp_tree.hpp"
 
 namespace rogue {
@@ -40,9 +38,10 @@ private:
     int last_y_;
 };
 
-Map::Map(int width, int height) : width(width), height(height) {
+Map::Map(int width, int height, MapCallbackInterface& engine, ActorCallbackInterface& actor_callback) :
+    width(width), height(height), engine_(engine), actor_callback_(actor_callback) {
     map_.resize(width * height);
-    BSPTree bsp(0, 0, width - 1, height - 1);
+    BSPTree bsp(1, 1, width - 2, height - 2);
     bsp.SplitRecursive(8, MIN_ROOM_HORIZ_SIZE, MIN_ROOM_VERT_SIZE, 1.5, 1.5);
     BSPListener callback(*this);
     bsp.TraverseLevelOrder(callback);
@@ -57,7 +56,7 @@ bool Map::CanWalk(int x, int y) {
     if (IsWall(x, y)) {
         return false;
     }
-    for (auto a : engine.actors) {
+    for (auto a : engine_.GetActors()) {
         if (a->x == x && a->y == y && a->blocks) {
             return false;
         }
@@ -108,19 +107,21 @@ void Map::ComputeFOV() {
     }
     for (int oct = 0; oct < 8; ++oct) {
         CastLight(
-            engine.player->x, engine.player->y, 1, 1.0, 0.0, engine.fov_radius, 
+            engine_.GetPlayer().x, engine_.GetPlayer().y, 1, 1.0, 0.0, engine_.GetFOVRadius(), 
             mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct]);
     }
-    map_[engine.player->x + engine.player->y * width].fov = 1;
+    map_[engine_.GetPlayer().x + engine_.GetPlayer().y * width].fov = 1;
 }
 
 void Map::PutMonster(int x, int y) {
     TCODRandom* rng = TCODRandom::getInstance();
     if (rng->getInt(0, 100) < 80) {
-        engine.actors.push_back(new Zombie(x, y, 'Z', TCODColor::desaturatedGreen, "zombie"));
+        engine_.GetActors().push_back(new Zombie(
+            x, y, 'Z', TCODColor::darkerGreen, "zombie", actor_callback_));
     }
     else {
-        engine.actors.push_back(new Dragon(x, y, 'D', TCODColor::red, "dragon"));
+        engine_.GetActors().push_back(new Dragon(
+            x, y, 'D', TCODColor::red, "dragon", actor_callback_));
     }
 }
 
@@ -146,8 +147,8 @@ void Map::CreateRoom(bool first, int x1, int y1, int x2, int y2) {
     last_y1 = y1;
     last_y2 = y2;
     if (first) {
-        engine.player->x = (x1 + x2) / 2;
-        engine.player->y = (y1 + y2) / 2;
+        engine_.GetPlayer().x = (x1 + x2) / 2;
+        engine_.GetPlayer().y = (y1 + y2) / 2;
     }
     else {
         TCODRandom* rng = TCODRandom::getInstance();
@@ -173,8 +174,8 @@ void Map::PutPrincess(int x1, int y1, int x2, int y2) {
     for (int x = x1; x <= x2; ++x) {
         for (int y = y1; y <= y2; ++y) {
             if (CanWalk(x, y)) {
-                engine.princess->x = x;
-                engine.princess->y = y;
+                engine_.GetPrincess().x = x;
+                engine_.GetPrincess().y = y;
                 return;
             }
         }

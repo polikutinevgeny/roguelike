@@ -1,13 +1,26 @@
 #pragma once
 #include "libtcod.hpp"
+#include <list>
 
 namespace rogue {
 
-const int GUI_PANEL_HEIGHT = 7;
+class Actor;
+
+class ActorCallbackInterface {
+public:
+    virtual void Win() = 0;
+    virtual void Lose() = 0;
+    virtual bool IsWall(int x, int y) = 0;
+    virtual bool CanWalk(int x, int y) = 0;
+    virtual bool IsInFOV(int x, int y) = 0;
+    virtual Actor& GetPlayer() = 0;
+    virtual std::list<Actor*>& GetActors() = 0;
+};
 
 class Actor {
 public:
-    Actor(int x, int y, int face, const TCODColor& color, const char* name);
+    Actor(int x, int y, int face, const TCODColor& color, const char* name,
+        ActorCallbackInterface& engine);
 
     void Render();
 
@@ -27,11 +40,15 @@ public:
     int damage;
 
     bool blocks;
+
+protected:
+    ActorCallbackInterface& engine_;
 };
 
 class Player : public Actor {
 public:
-    Player(int x, int y, int face, const TCODColor& color, const char* name);
+    Player(int x, int y, int face, const TCODColor& color, const char* name,
+        ActorCallbackInterface& engine);
 
     void Update() override;
 
@@ -42,7 +59,8 @@ public:
 
 class Monster : public Actor {
 public:
-    Monster(int x, int y, int face, const TCODColor& color, const char* name);
+    Monster(int x, int y, int face, const TCODColor& color, const char* name,
+        ActorCallbackInterface& engine);
     virtual ~Monster() = 0; //we need class to be abstract
 
     void Update() override;
@@ -55,21 +73,24 @@ protected:
 
 class Zombie : public Monster {
 public:
-    Zombie(int x, int y, int face, const TCODColor& color, const char* name);
+    Zombie(int x, int y, int face, const TCODColor& color, const char* name,
+        ActorCallbackInterface& engine);
 
     void RecieveDamage(int dmg) override;
 };
 
 class Dragon : public Monster {
 public:
-    Dragon(int x, int y, int face, const TCODColor& color, const char* name);
+    Dragon(int x, int y, int face, const TCODColor& color, const char* name,
+        ActorCallbackInterface& engine);
 
     void RecieveDamage(int dmg) override;
 };
 
 class Princess : public Actor {
 public:
-    Princess(int x, int y, int face, const TCODColor& color, const char* name);
+    Princess(int x, int y, int face, const TCODColor& color, const char* name,
+        ActorCallbackInterface& engine);
 
     void Update() override;
 
