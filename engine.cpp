@@ -4,6 +4,7 @@
 namespace rogue {
 
 const int GUI_PANEL_HEIGHT = 7;
+static const int GUI_PANEL_WIDTH = 40;
 
 rogue::Engine::Engine(int width, int height) :
     fov_radius(10), compute_fov_(true), status_(STARTUP), width(width), height(height) {
@@ -13,7 +14,7 @@ rogue::Engine::Engine(int width, int height) :
     actors.push_back(player);
     actors.push_back(princess);
     map = new Map(width, height - GUI_PANEL_HEIGHT, *this, *this);
-    gui_ = new Gui(width, GUI_PANEL_HEIGHT, width, height, *this);
+    gui_ = new Gui(GUI_PANEL_WIDTH, GUI_PANEL_HEIGHT, width, height, *this);
 }
 
 rogue::Engine::~Engine() {

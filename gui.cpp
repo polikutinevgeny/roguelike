@@ -2,8 +2,6 @@
 
 namespace rogue {
 
-static const int BAR_WIDTH = 20;
-
 Gui::Gui(int gui_width, int gui_height, int main_width, int main_height, GuiCallbackInterface& engine) :
     engine_(engine), gui_width_(gui_width), gui_height_(gui_height), 
     main_width_(main_width), main_height_(main_height) {
@@ -17,7 +15,7 @@ Gui::~Gui() {
 void Gui::Render() {
     con_->setDefaultBackground(TCODColor::black);
     con_->clear();
-    RenderBar(1, 1, BAR_WIDTH, "HP", engine_.GetPlayer().hp, engine_.GetPlayer().max_hp, TCODColor::lightRed, TCODColor::darkerRed);
+    RenderBar(1, 1, gui_width_, "HP", engine_.GetPlayer().hp, engine_.GetPlayer().max_hp, TCODColor::lightRed, TCODColor::darkerRed);
     TCODConsole::blit(con_, 0, 0, main_width_, gui_height_, TCODConsole::root, 0, main_height_ - gui_height_);
 }
 
