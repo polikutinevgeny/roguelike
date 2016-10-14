@@ -42,7 +42,7 @@ private:
 
 Map::Map(int width, int height) : width(width), height(height) {
     map_.resize(width * height);
-    BSPTree bsp(1, 1, width - 3, height - 3);
+    BSPTree bsp(0, 0, width - 1, height - 1);
     bsp.SplitRecursive(8, MIN_ROOM_HORIZ_SIZE, MIN_ROOM_VERT_SIZE, 1.5, 1.5);
     BSPListener callback(*this);
     bsp.TraverseLevelOrder(callback);
@@ -109,7 +109,7 @@ void Map::ComputeFOV() {
     for (int oct = 0; oct < 8; ++oct) {
         CastLight(
             engine.player->x, engine.player->y, 1, 1.0, 0.0, engine.fov_radius, 
-            engine.fov_radius * engine.fov_radius, mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct]);
+            mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct]);
     }
     map_[engine.player->x + engine.player->y * width].fov = 1;
 }
@@ -181,18 +181,15 @@ void Map::PutPrincess(int x1, int y1, int x2, int y2) {
     }
 }
 
-void Map::CastLight(int cx, int cy, int row, double start, double end, int radius, int r2,
-    int xx, int xy, int yx, int yy) {
-    double new_start = 0.0f;
+void Map::CastLight(int cx, int cy, int row, double start, double end, 
+    int radius, int xx, int xy, int yx, int yy) {
+    double new_start = 0.0;
     if (start < end) {
         return;
     }
     for (int j = row; j < radius + 1; j++) {
-        int dx = -j - 1;
-        int dy = -j;
         bool blocked = false;
-        while (dx <= 0) {
-            dx++;
+        for (int dx = -j, dy = -j; dx <= 0; ++dx) {
             int x = cx + dx * xx + dy * xy;
             int y = cy + dx * yx + dy * yy;
             if (x < width && y < height && x >= 0 && y >= 0) {
@@ -205,7 +202,7 @@ void Map::CastLight(int cx, int cy, int row, double start, double end, int radiu
                 else if (end > l_slope) {
                     break;
                 }
-                if (dx * dx + dy * dy <= r2) {
+                if (dx * dx + dy * dy <= radius * radius) {
                     map_[offset].fov = 1;
                 }
                 if (blocked) {
@@ -221,7 +218,7 @@ void Map::CastLight(int cx, int cy, int row, double start, double end, int radiu
                 else {
                     if (!map_[offset].transparent && j < radius) {
                         blocked = true;
-                        CastLight(cx, cy, j + 1, start, l_slope, radius, r2, xx, xy, yx, yy);
+                        CastLight(cx, cy, j + 1, start, l_slope, radius, xx, xy, yx, yy);
                         new_start = r_slope;
                     }
                 }

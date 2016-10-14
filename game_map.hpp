@@ -30,8 +30,8 @@ private:
     std::vector<Tile> map_;
     friend class BSPListener;
 
-    void CastLight(int cx, int cy, int row, double start, double end, int radius, int r2,
-        int xx, int xy, int yx, int yy);
+    void CastLight(int cx, int cy, int row, double start, double end, 
+        int radius, int xx, int xy, int yx, int yy);
 
     void Dig(int x1, int y1, int x2, int y2);
     void CreateRoom(bool first, int x1, int y1, int x2, int y2);
