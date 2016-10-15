@@ -7,14 +7,6 @@
 
 namespace rogue {
 
-enum GameStatus {
-    STARTUP,
-    IDLE,
-    NEW_TURN,
-    VICTORY,
-    DEFEAT,
-};
-
 class Engine : public ActorCallbackInterface, public GuiCallbackInterface, public MapCallbackInterface {
 public:
     Engine(int width, int height);
@@ -43,6 +35,14 @@ public:
     int height;
 
 private:
+    enum class GameStatus {
+        STARTUP,
+        IDLE,
+        NEW_TURN,
+        VICTORY,
+        DEFEAT,
+    };
+
     bool compute_fov_;
 
     Gui* gui_;

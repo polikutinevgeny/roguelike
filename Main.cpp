@@ -5,7 +5,7 @@
 
 //#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
-rogue::Engine rogue::engine(100, 70);
+rogue::Engine rogue::engine(100, 60);
 
 int main() {
     //_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF); _ASSERTE(_CrtCheckMemory());

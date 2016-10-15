@@ -4,9 +4,8 @@
 
 namespace rogue {
 
-BSPTree::BSPTree(int x, int y, int w, int h) :
-    left_(NULL), father_(NULL), right_(NULL), x(x), y(y), w(w), h(h), level_(0) {
-}
+BSPTree::BSPTree(int x, int y, int w, int h) 
+    : left_(NULL), father_(NULL), right_(NULL), x(x), y(y), w(w), h(h), level_(0) {}
 
 BSPTree::~BSPTree() {
     delete left_;

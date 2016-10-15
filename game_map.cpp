@@ -4,15 +4,20 @@
 
 namespace rogue {
 
-static int last_x1, last_y1, last_x2, last_y2;
+namespace {
 
-static const int MAX_ROOM_MONSTERS = 3;
-static const int MIN_ROOM_VERT_SIZE = 6;
-static const int MIN_ROOM_HORIZ_SIZE = 12;
+int last_x1, last_y1, last_x2, last_y2;
+
+const int MAX_ROOM_MONSTERS = 3;
+const int MIN_ROOM_VERT_SIZE = 6;
+const int MIN_ROOM_HORIZ_SIZE = 12;
+
+}
 
 class BSPListener : public BSPTreeCallbackInterface {
 public:
-    BSPListener(Map& map) : map_(map), room_num_(0) {};
+    BSPListener(Map& map) 
+        : map_(map), room_num_(0) {};
 
     virtual void VisitNode(BSPTree const* node) override {
         if (node->IsLeaf()) {
@@ -38,8 +43,9 @@ private:
     int last_y_;
 };
 
-Map::Map(int width, int height, MapCallbackInterface& engine, ActorCallbackInterface& actor_callback) :
-    width(width), height(height), engine_(engine), actor_callback_(actor_callback) {
+Map::Map(int width, int height, MapCallbackInterface& engine, ActorCallbackInterface& actor_callback) 
+    : width(width), height(height), engine_(engine), actor_callback_(actor_callback) 
+{
     map_.resize(width * height);
     BSPTree bsp(1, 1, width - 2, height - 2);
     bsp.SplitRecursive(8, MIN_ROOM_HORIZ_SIZE, MIN_ROOM_VERT_SIZE, 1.5, 1.5);

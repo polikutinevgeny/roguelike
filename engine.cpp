@@ -3,11 +3,17 @@
 
 namespace rogue {
 
-const int GUI_PANEL_HEIGHT = 7;
-static const int GUI_PANEL_WIDTH = 40;
+namespace {
 
-rogue::Engine::Engine(int width, int height) :
-    fov_radius(10), compute_fov_(true), status_(STARTUP), width(width), height(height) {
+const int GUI_PANEL_HEIGHT = 7;
+const int GUI_PANEL_WIDTH = 40;
+
+}
+
+rogue::Engine::Engine(int width, int height) 
+    : fov_radius(10), compute_fov_(true), status_(GameStatus::STARTUP), width(width), height(height)
+{
+    TCODConsole::setCustomFont("terminal.png", TCOD_FONT_LAYOUT_TCOD | TCOD_FONT_TYPE_GREYSCALE, 32, 8);
     TCODConsole::initRoot(width, height, "Rogue-like game", false);
     player = new Player(40, 25, 'K', TCODColor::white, "player", *this);
     princess = new Princess(40, 30, 'P', TCODColor::darkerGrey, "princess", *this);
@@ -27,11 +33,13 @@ rogue::Engine::~Engine() {
 
 void rogue::Engine::Update() {
     TCOD_key_t key;
-    if (status_ == STARTUP) {
+    if (status_ == GameStatus::STARTUP) {
         map->ComputeFOV();
+        Render();
+        TCODConsole::root->flush();
     }
-    TCODSystem::checkForEvent(TCOD_EVENT_KEY_PRESS, &key, NULL);
-    if (status_ == VICTORY || status_ == DEFEAT) {
+    TCODSystem::waitForEvent(TCOD_EVENT_KEY_PRESS, &key, NULL, false);
+    if (status_ == GameStatus::VICTORY || status_ == GameStatus::DEFEAT) {
         if (key.vk == TCODK_ENTER) {
             exit(0);
         }
@@ -39,7 +47,7 @@ void rogue::Engine::Update() {
     }
     int dx = 0;
     int dy = 0;
-    status_ = IDLE;
+    status_ = GameStatus::IDLE;
     switch (key.vk) {
         case TCODK_UP:
             dy = -1;
@@ -56,12 +64,14 @@ void rogue::Engine::Update() {
         default:break;
     }
     if (dx || dy) {
-        if (player->MoveOrAttack(player->x + dx, player->y + dy) && status_ != VICTORY) {
-            status_ = NEW_TURN;
+        if (player->MoveOrAttack(player->x + dx, player->y + dy) == ActorStatus::Moved && 
+            status_ != GameStatus::VICTORY)
+        {
+            status_ = GameStatus::NEW_TURN;
             map->ComputeFOV();
         }
     }
-    if (status_ == NEW_TURN) {
+    if (status_ == GameStatus::NEW_TURN) {
         for (auto a : actors) {
             if (a != player) {
                 a->Update();
@@ -73,11 +83,11 @@ void rogue::Engine::Update() {
 
 void rogue::Engine::Render() {
     TCODConsole::root->clear();
-    if (status_ == VICTORY) {
+    if (status_ == GameStatus::VICTORY) {
         TCODConsole::root->printEx(width / 2, height / 2, TCOD_BKGND_NONE, TCOD_CENTER, "YOU WON");
         return;
     }
-    if (status_ == DEFEAT) {
+    if (status_ == GameStatus::DEFEAT) {
         TCODConsole::root->printEx(width / 2, height / 2, TCOD_BKGND_NONE, TCOD_CENTER, "YOU LOST");
         return;
     }
@@ -96,7 +106,7 @@ void rogue::Engine::Render() {
 }
 
 void rogue::Engine::Lose() {
-    status_ = DEFEAT;
+    status_ = GameStatus::DEFEAT;
 }
 
 bool Engine::IsWall(int x, int y) {
@@ -128,7 +138,7 @@ int Engine::GetFOVRadius() {
 }
 
 void rogue::Engine::Win() {
-    status_ = VICTORY;
+    status_ = GameStatus::VICTORY;
 }
 
 }

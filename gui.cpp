@@ -2,9 +2,10 @@
 
 namespace rogue {
 
-Gui::Gui(int gui_width, int gui_height, int main_width, int main_height, GuiCallbackInterface& engine) :
-    engine_(engine), gui_width_(gui_width), gui_height_(gui_height), 
-    main_width_(main_width), main_height_(main_height) {
+Gui::Gui(int gui_width, int gui_height, int main_width, int main_height, GuiCallbackInterface& engine) 
+    : engine_(engine), gui_width_(gui_width), gui_height_(gui_height)
+    , main_width_(main_width), main_height_(main_height) 
+{
     con_ = new TCODConsole(gui_width, gui_height);
 }
 

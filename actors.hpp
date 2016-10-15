@@ -4,6 +4,11 @@
 
 namespace rogue {
 
+enum class ActorStatus {
+    Moved,
+    NotMoved,
+};
+
 class Actor;
 
 class ActorCallbackInterface {
@@ -19,19 +24,19 @@ public:
 
 class Actor {
 public:
-    Actor(int x, int y, int face, const TCODColor& color, const char* name,
+    Actor(int x, int y, int symbol, const TCODColor& color, const char* name,
         ActorCallbackInterface& engine);
 
     void Render();
 
     virtual void Update() = 0;
 
-    virtual bool MoveOrAttack(int x, int y) = 0;
+    virtual ActorStatus MoveOrAttack(int x, int y) = 0;
 
     virtual void RecieveDamage(int dmg) = 0;
 
     int x, y;
-    int face;
+    int symbol;
     TCODColor color;
     const char* name;
 
@@ -47,25 +52,25 @@ protected:
 
 class Player : public Actor {
 public:
-    Player(int x, int y, int face, const TCODColor& color, const char* name,
+    Player(int x, int y, int symbol, const TCODColor& color, const char* name,
         ActorCallbackInterface& engine);
 
     void Update() override;
 
-    bool MoveOrAttack(int x, int y) override;
+    ActorStatus MoveOrAttack(int x, int y) override;
 
     void RecieveDamage(int dmg) override;
 };
 
 class Monster : public Actor {
 public:
-    Monster(int x, int y, int face, const TCODColor& color, const char* name,
+    Monster(int x, int y, int symbol, const TCODColor& color, const char* name,
         ActorCallbackInterface& engine);
     virtual ~Monster() = 0; //we need class to be abstract
 
     void Update() override;
 
-    bool MoveOrAttack(int x, int y) override;
+    ActorStatus MoveOrAttack(int x, int y) override;
 
 protected:
     int move_count_;
@@ -73,7 +78,7 @@ protected:
 
 class Zombie : public Monster {
 public:
-    Zombie(int x, int y, int face, const TCODColor& color, const char* name,
+    Zombie(int x, int y, int symbol, const TCODColor& color, const char* name,
         ActorCallbackInterface& engine);
 
     void RecieveDamage(int dmg) override;
@@ -81,7 +86,7 @@ public:
 
 class Dragon : public Monster {
 public:
-    Dragon(int x, int y, int face, const TCODColor& color, const char* name,
+    Dragon(int x, int y, int symbol, const TCODColor& color, const char* name,
         ActorCallbackInterface& engine);
 
     void RecieveDamage(int dmg) override;
@@ -89,12 +94,12 @@ public:
 
 class Princess : public Actor {
 public:
-    Princess(int x, int y, int face, const TCODColor& color, const char* name,
+    Princess(int x, int y, int symbol, const TCODColor& color, const char* name,
         ActorCallbackInterface& engine);
 
     void Update() override;
 
-    bool MoveOrAttack(int x, int y) override;
+    ActorStatus MoveOrAttack(int x, int y) override;
 
     void RecieveDamage(int dmg) override;
 };
