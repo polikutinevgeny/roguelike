@@ -125,7 +125,7 @@ ActorStatus Monster::MoveOrAttack(int x, int y) {
     if (d > 1) {
         dx = (int) std::round(dx / d);
         dy = (int) std::round(dy / d);
-        if (engine_.CanWalk(this->x + dx, this->y + dy)) {
+        if (engine_.CanWalk(this->x + dx, this->y + dy) && ((dx != 0) != (dy != 0))) {
             this->x += dx;
             this->y += dy;
         }
