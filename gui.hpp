@@ -6,7 +6,7 @@ namespace rogue {
 
 class GuiCallbackInterface {
 public:
-    virtual Actor& GetPlayer() = 0;
+    virtual Player* GetPlayer() = 0;
 };
 
 class Gui {

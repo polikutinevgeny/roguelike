@@ -12,7 +12,7 @@ int main() {
     while (!TCODConsole::isWindowClosed()) {
         rogue::engine.Update();
         rogue::engine.Render();
-        TCODConsole::flush ();
+        TCODConsole::flush();
     }
     return 0;
 }

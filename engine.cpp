@@ -61,10 +61,31 @@ void rogue::Engine::Update() {
         case TCODK_RIGHT:
             dx = 1;
             break;
-        default:break;
+        default:
+            switch (key.c) {
+                case 'w':
+                    player->Shoot(0, -1);
+                    status_ = GameStatus::NEW_TURN;
+                    break;
+                case 'a':
+                    player->Shoot(-1, 0);
+                    status_ = GameStatus::NEW_TURN;
+                    break;
+                case 's':
+                    player->Shoot(0, 1);
+                    status_ = GameStatus::NEW_TURN;
+                    break;
+                case 'd':
+                    player->Shoot(1, 0);
+                    status_ = GameStatus::NEW_TURN;
+                    break;
+                default:
+                    break;
+            }
+            break;
     }
     if (dx || dy) {
-        if (player->MoveOrAttack(player->x + dx, player->y + dy) == ActorStatus::Moved && 
+        if (player->Act(player->x + dx, player->y + dy) == ActorStatus::Moved && 
             status_ != GameStatus::VICTORY)
         {
             status_ = GameStatus::NEW_TURN;
@@ -72,10 +93,21 @@ void rogue::Engine::Update() {
         }
     }
     if (status_ == GameStatus::NEW_TURN) {
-        for (auto a : actors) {
-            if (a != player) {
-                a->Update();
+        for (auto a = actors.begin(); a != actors.end();) {
+            if ((*a)->name == "fireball") {
+                printf("hello\n");
             }
+            if (*a != player) {
+                (*a)->Update();
+                if ((*a)->remove) {
+                    a = actors.erase(a);
+                }
+                else {
+                    ++a;
+                }
+                continue;
+            }
+            ++a;
         }
         printf("Princess dx: %d, dy %d\n", princess->x - player->x, princess->y - player->y);
     }
@@ -121,12 +153,16 @@ bool Engine::IsInFOV(int x, int y) {
     return map->IsInFOV(x, y);
 }
 
-Actor& Engine::GetPlayer() {
-    return *player;
+void Engine::Destroy(int x, int y) {
+    map->Destroy(x, y);
 }
 
-Actor& Engine::GetPrincess() {
-    return *princess;
+Player* Engine::GetPlayer() {
+    return player;
+}
+
+Actor* Engine::GetPrincess() {
+    return princess;
 }
 
 std::list<Actor*>& Engine::GetActors() {

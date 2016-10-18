@@ -16,7 +16,7 @@ Gui::~Gui() {
 void Gui::Render() {
     con_->setDefaultBackground(TCODColor::black);
     con_->clear();
-    RenderBar(1, 1, gui_width_, "HP", engine_.GetPlayer().hp, engine_.GetPlayer().max_hp, TCODColor::lightRed, TCODColor::darkerRed);
+    RenderBar(1, 1, gui_width_, "HP", engine_.GetPlayer()->hp, engine_.GetPlayer()->max_hp, TCODColor::lightRed, TCODColor::darkerRed);
     TCODConsole::blit(con_, 0, 0, main_width_, gui_height_, TCODConsole::root, 0, main_height_ - gui_height_);
 }
 

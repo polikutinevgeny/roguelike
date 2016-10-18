@@ -6,8 +6,8 @@ namespace rogue {
 
 class MapCallbackInterface {
 public:
-    virtual Actor& GetPlayer() = 0;
-    virtual Actor& GetPrincess() = 0;
+    virtual Actor* GetPlayer() = 0;
+    virtual Actor* GetPrincess() = 0;
     virtual std::list<Actor*>& GetActors() = 0;
     virtual int GetFOVRadius() = 0;
 };
@@ -31,6 +31,8 @@ public:
     bool IsInFOV(int x, int y);
     bool IsExplored(int x, int y);
     void ComputeFOV();
+
+    void Destroy(int x, int y);
 
     int width, height;
 

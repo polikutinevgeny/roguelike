@@ -113,10 +113,16 @@ void Map::ComputeFOV() {
     }
     for (int oct = 0; oct < 8; ++oct) {
         CastLight(
-            engine_.GetPlayer().x, engine_.GetPlayer().y, 1, 1.0, 0.0, engine_.GetFOVRadius(), 
+            engine_.GetPlayer()->x, engine_.GetPlayer()->y, 1, 1.0, 0.0, engine_.GetFOVRadius(), 
             mult[0][oct], mult[1][oct], mult[2][oct], mult[3][oct]);
     }
-    map_[engine_.GetPlayer().x + engine_.GetPlayer().y * width].fov = 1;
+    map_[engine_.GetPlayer()->x + engine_.GetPlayer()->y * width].fov = 1;
+}
+
+void Map::Destroy(int x, int y) {
+    map_[x + width * y].walkable = true;
+    map_[x + width * y].transparent = true;
+    ComputeFOV();
 }
 
 void Map::PutMonster(int x, int y) {
@@ -153,8 +159,8 @@ void Map::CreateRoom(bool first, int x1, int y1, int x2, int y2) {
     last_y1 = y1;
     last_y2 = y2;
     if (first) {
-        engine_.GetPlayer().x = (x1 + x2) / 2;
-        engine_.GetPlayer().y = (y1 + y2) / 2;
+        engine_.GetPlayer()->x = (x1 + x2) / 2;
+        engine_.GetPlayer()->y = (y1 + y2) / 2;
     }
     else {
         TCODRandom* rng = TCODRandom::getInstance();
@@ -180,8 +186,8 @@ void Map::PutPrincess(int x1, int y1, int x2, int y2) {
     for (int x = x1; x <= x2; ++x) {
         for (int y = y1; y <= y2; ++y) {
             if (CanWalk(x, y)) {
-                engine_.GetPrincess().x = x;
-                engine_.GetPrincess().y = y;
+                engine_.GetPrincess()->x = x;
+                engine_.GetPrincess()->y = y;
                 return;
             }
         }

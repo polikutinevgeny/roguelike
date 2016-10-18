@@ -20,8 +20,9 @@ public:
     bool IsWall(int x, int y) override;
     bool CanWalk(int x, int y) override;
     bool IsInFOV(int x, int y) override;
-    Actor& GetPlayer() override;
-    Actor& GetPrincess() override;
+    void Destroy(int x, int y) override;
+    Player* GetPlayer() override;
+    Actor* GetPrincess() override;
     std::list<Actor*>& GetActors() override;
     int GetFOVRadius() override;
 
