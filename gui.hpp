@@ -1,6 +1,7 @@
 #pragma once
 #include "libtcod.hpp"
 #include "actors.hpp"
+#include "loot.hpp"
 
 namespace rogue {
 
@@ -25,6 +26,8 @@ private:
     TCODConsole* con_;
 
     void RenderBar(int x, int y, int width, const char* name, int value, int max_value, const TCODColor& bar_color, const TCODColor& back_color);
+
+    void RenderInventory(int x, int y, std::vector<Potion*>& inventory);
 };
 
 }

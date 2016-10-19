@@ -6,9 +6,10 @@ namespace rogue {
 
 class MapCallbackInterface {
 public:
-    virtual Actor* GetPlayer() = 0;
+    virtual Player* GetPlayer() = 0;
     virtual Actor* GetPrincess() = 0;
     virtual std::list<Actor*>& GetActors() = 0;
+    virtual std::list<Potion*>& GetLoot() = 0;
     virtual int GetFOVRadius() = 0;
 };
 
@@ -26,7 +27,7 @@ public:
 
     bool IsWall(int x, int y);
     bool CanWalk(int x, int y);
-    void Render();
+    void Render(int mx, int my);
 
     bool IsInFOV(int x, int y);
     bool IsExplored(int x, int y);

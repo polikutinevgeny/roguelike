@@ -4,6 +4,7 @@
 #include "game_map.hpp"
 #include "gui.hpp"
 #include "actors.hpp"
+#include "loot.hpp"
 
 namespace rogue {
 
@@ -26,8 +27,10 @@ public:
     Actor* GetPrincess() override;
     std::list<Actor*>& GetActors() override;
     int GetFOVRadius() override;
+    std::list<Potion*>& GetLoot() override;
 
     std::list<Actor*> actors;
+    std::list<Potion*> loot;
     Player* player;
     Princess* princess;
     Map* map;
@@ -52,7 +55,5 @@ private:
     GameStatus status_;
 
 };
-
-extern Engine engine;
 
 }

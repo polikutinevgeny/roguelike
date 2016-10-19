@@ -1,6 +1,8 @@
 #pragma once
 #include "libtcod.hpp"
 #include <list>
+#include <vector>
+#include "loot.hpp"
 
 namespace rogue {
 
@@ -24,6 +26,7 @@ public:
     virtual Player* GetPlayer() = 0;
     virtual Actor* GetPrincess() = 0;
     virtual std::list<Actor*>& GetActors() = 0;
+    virtual std::list<Potion*>& GetLoot() = 0;
 };
 
 class Character;
@@ -33,7 +36,7 @@ public:
     Actor(int x, int y, int symbol, const TCODColor& color, const char* name,
         ActorCallbackInterface& engine);
 
-    void Render();
+    void Render(int mx, int my);
 
     virtual void Update() = 0;
 
@@ -64,7 +67,7 @@ public:
     int max_hp;
 };
 
-class Player : public Character {
+class Player : public Character, public PlayerInterface {
 public:
     Player(int x, int y, int symbol, const TCODColor& color, const char* name,
         ActorCallbackInterface& engine);
@@ -76,6 +79,22 @@ public:
     void Interact(Actor& other) override;
 
     void Shoot(int dx, int dy);
+
+    void UseInventory(int n);
+
+    int& GetHP() override;
+    int& GetMaxHP() override;
+    int& GetDamage() override;
+    bool& Invulnerable() override;
+    int& InvulnerabilityPeriod() override;
+
+    std::vector<Potion*> inventory;
+    bool invulnerable;
+    int invulnerability_period;
+
+    int mp;
+    int max_mp;
+
 };
 
 class Monster : public Character {

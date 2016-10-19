@@ -5,13 +5,12 @@
 
 //#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
 
-rogue::Engine rogue::engine(100, 60);
-
 int main() {
+    rogue::Engine engine(100, 60);
     //_CrtSetDbgFlag(_CRTDBG_CHECK_ALWAYS_DF); _ASSERTE(_CrtCheckMemory());
     while (!TCODConsole::isWindowClosed()) {
-        rogue::engine.Update();
-        rogue::engine.Render();
+        engine.Update();
+        engine.Render();
         TCODConsole::flush();
     }
     return 0;

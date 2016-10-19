@@ -157,6 +157,7 @@
     <ClCompile Include="engine.cpp" />
     <ClCompile Include="game_map.cpp" />
     <ClCompile Include="gui.cpp" />
+    <ClCompile Include="loot.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -165,6 +166,7 @@
     <ClInclude Include="engine.hpp" />
     <ClInclude Include="game_map.hpp" />
     <ClInclude Include="gui.hpp" />
+    <ClInclude Include="loot.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

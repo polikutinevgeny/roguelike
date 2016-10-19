@@ -33,22 +33,28 @@
     <ClCompile Include="main.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="loot.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="game_map.hpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClInclude>
-    <ClInclude Include="engine.hpp">
-      <Filter>Файлы исходного кода</Filter>
+    <ClInclude Include="loot.hpp">
+      <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="actors.hpp">
-      <Filter>Файлы исходного кода</Filter>
-    </ClInclude>
-    <ClInclude Include="gui.hpp">
-      <Filter>Файлы исходного кода</Filter>
+      <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="bsp_tree.hpp">
-      <Filter>Файлы исходного кода</Filter>
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="engine.hpp">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="game_map.hpp">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
+    <ClInclude Include="gui.hpp">
+      <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

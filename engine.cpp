@@ -6,13 +6,14 @@ namespace rogue {
 namespace {
 
 const int GUI_PANEL_HEIGHT = 7;
-const int GUI_PANEL_WIDTH = 40;
+const int GUI_PANEL_WIDTH = 60;
 
 }
 
 rogue::Engine::Engine(int width, int height) 
     : fov_radius(10), compute_fov_(true), status_(GameStatus::STARTUP), width(width), height(height)
 {
+    ShufflePotions();
     TCODConsole::setCustomFont("terminal.png", TCOD_FONT_LAYOUT_TCOD | TCOD_FONT_TYPE_GREYSCALE, 32, 8);
     TCODConsole::initRoot(width, height, "Rogue-like game", false);
     player = new Player(40, 25, 'K', TCODColor::white, "player", *this);
@@ -60,6 +61,18 @@ void rogue::Engine::Update() {
             break;
         case TCODK_RIGHT:
             dx = 1;
+            break;
+        case TCODK_0:
+        case TCODK_1:
+        case TCODK_2:
+        case TCODK_3:
+        case TCODK_4:
+        case TCODK_5:
+        case TCODK_6:
+        case TCODK_7:
+        case TCODK_8:
+        case TCODK_9:
+            player->UseInventory(stoi(std::string(1, key.c)));
             break;
         default:
             switch (key.c) {
@@ -124,15 +137,20 @@ void rogue::Engine::Render() {
         TCODConsole::root->printEx(width / 2, height / 2, TCOD_BKGND_NONE, TCOD_CENTER, "YOU LOST");
         return;
     }
-    map->Render();
+    map->Render(0, GUI_PANEL_HEIGHT);
+    for (auto l : loot) {
+        if (map->IsInFOV(l->x, l->y)) {
+            l->Render(0, GUI_PANEL_HEIGHT);
+        }
+    }
     for (auto a : actors) {
         if (map->IsInFOV(a->x, a->y) && !a->blocks) {
-            a->Render();
+            a->Render(0, GUI_PANEL_HEIGHT);
         }
     }
     for (auto a : actors) {
         if (map->IsInFOV(a->x, a->y) && a->blocks) {
-            a->Render();
+            a->Render(0, GUI_PANEL_HEIGHT);
         }
     }
     gui_->Render();
@@ -176,6 +194,10 @@ std::list<Actor*>& Engine::GetActors() {
 
 int Engine::GetFOVRadius() {
     return fov_radius;
+}
+
+std::list<Potion*>& Engine::GetLoot() {
+    return loot;
 }
 
 void rogue::Engine::Win() {

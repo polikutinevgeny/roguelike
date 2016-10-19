@@ -1,6 +1,7 @@
 #include "libtcod.hpp"
 #include "game_map.hpp"
 #include "bsp_tree.hpp"
+#include "loot.hpp"
 
 namespace rogue {
 
@@ -70,7 +71,7 @@ bool Map::CanWalk(int x, int y) {
     return true;
 }
 
-void Map::Render() {
+void Map::Render(int mx, int my) {
     static const TCODColor wall(0, 0, 100);
     static const TCODColor ground(50, 50, 150);
     static const TCODColor light_wall(130, 110, 50);
@@ -78,11 +79,11 @@ void Map::Render() {
     for (int x = 0; x < width; ++x) {
         for (int y = 0; y < height; ++y) {
             if (IsInFOV(x, y)) {
-                TCODConsole::root->setCharBackground(x, y,
+                TCODConsole::root->setCharBackground(x + mx, y + my,
                     IsWall(x, y) ? light_wall : light_ground);
             }
             else if (IsExplored(x, y)) {
-                TCODConsole::root->setCharBackground(x, y,
+                TCODConsole::root->setCharBackground(x + mx, y + my,
                     IsWall(x, y) ? wall : ground);
             }
         }
@@ -176,6 +177,11 @@ void Map::CreateRoom(bool first, int x1, int y1, int x2, int y2) {
                 PutMonster(x, y);
             }
             num--;
+        }
+        int x = rng->getInt(x1, x2);
+        int y = rng->getInt(y1, y2);
+        if (CanWalk(x, y)) {
+            engine_.GetLoot().push_back(CreatePotion(x, y, engine_.GetPlayer()));
         }
     }
 }

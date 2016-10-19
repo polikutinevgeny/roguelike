@@ -2,6 +2,7 @@
 #include "libtcod.hpp"
 #include <stdio.h>
 #include <cmath>
+#include <algorithm>
 
 namespace rogue {
 
@@ -10,11 +11,14 @@ namespace {
 const int TRACKING_TURNS = 3;
 const int BASE_PLAYER_HP = 10000;
 const int BASE_PLAYER_DMG = 100;
+const int BASE_PLAYER_MP = 10000;
 const int BASE_ZOMBIE_HP = 20;
 const int BASE_ZOMBIE_DMG = 5;
 const int BASE_DRAGON_HP = 40;
 const int BASE_DRAGON_DMG = 10;
 const int BASE_PROJECTILE_DMG = 20;
+const int MAX_INVENTORY_SIZE = 10;
+const int FIREBALL_MP_COST = 10;
 
 }
 
@@ -30,16 +34,21 @@ Actor::Actor(int x, int y, int symbol, const TCODColor & color, const char * nam
 
 }
 
-void Actor::Render() {
-    TCODConsole::root->setChar(x, y, symbol);
-    TCODConsole::root->setCharForeground(x, y, color);
+void Actor::Render(int mx, int my) {
+    TCODConsole::root->setChar(x + mx, y + my, symbol);
+    TCODConsole::root->setCharForeground(x + mx, y + my, color);
 }
 
 Character::Character(int x, int y, int symbol, const TCODColor& color, const char* name,
     ActorCallbackInterface& engine) : Actor(x, y, symbol, color, name, engine) {}
 
 Player::Player(int x, int y, int symbol, const TCODColor& color, const char* name,
-    ActorCallbackInterface& engine) : Character(x, y, symbol, color, name, engine) {
+    ActorCallbackInterface& engine) : Character(x, y, symbol, color, name, engine)
+    , invulnerable(false)
+    , invulnerability_period(0)
+    , mp(BASE_PLAYER_MP)
+    , max_mp(BASE_PLAYER_MP)
+{
     hp = BASE_PLAYER_HP;
     max_hp = BASE_PLAYER_HP;
     damage = BASE_PLAYER_DMG;
@@ -50,8 +59,21 @@ void Player::Update() {
 }
 
 ActorStatus Player::Act(int x, int y) {
+    invulnerability_period = std::max(0, invulnerability_period - 1);
+    if (invulnerability_period == 0) {
+        invulnerable = false;
+    }
     if (engine_.IsWall(x, y)) {
         return ActorStatus::NotMoved;
+    }
+    for (auto l = engine_.GetLoot().begin(); l != engine_.GetLoot().end();) {
+        if ((*l)->x == x && (*l)->y == y && inventory.size() < MAX_INVENTORY_SIZE) {
+            inventory.push_back(*l);
+            l = engine_.GetLoot().erase(l);
+        }
+        else {
+            ++l;
+        }
     }
     for (auto a : engine_.GetActors()) {
         if (a->x == x && a->y == y/* && a->blocks*/) {
@@ -65,6 +87,9 @@ ActorStatus Player::Act(int x, int y) {
 }
 
 void Player::Interact(Actor& other) {
+    if (invulnerable) {
+        return;
+    }
     if (hp - other.damage <= 0) {
         engine_.Lose();
     }
@@ -72,9 +97,40 @@ void Player::Interact(Actor& other) {
 }
 
 void Player::Shoot(int dx, int dy) {
-    if (engine_.IsInBounds(x + dx, y + dy) && engine_.CanWalk(x + dx, y + dy)) {
-        engine_.GetActors().push_front(new Projectile(x + dx, y + dy, '@', TCODColor::red, "fireball", engine_, 1, dx, dy));
+    invulnerability_period = std::max(0, invulnerability_period - 1);
+    if (invulnerability_period == 0) {
+        invulnerable = false;
     }
+    if (engine_.IsInBounds(x + dx, y + dy) && engine_.CanWalk(x + dx, y + dy) && mp >= FIREBALL_MP_COST) {
+        engine_.GetActors().push_front(new Projectile(x + dx, y + dy, '@', TCODColor::red, "fireball", engine_, 1, dx, dy));
+        mp -= FIREBALL_MP_COST;
+    }
+}
+
+void Player::UseInventory(int n) {
+    inventory[n]->Use();
+    printf("You used %s potion\n", inventory[n]->name);
+    inventory.erase(inventory.begin() + n);
+}
+
+int & Player::GetHP() {
+    return hp;
+}
+
+int & Player::GetMaxHP() {
+    return max_hp;
+}
+
+int & Player::GetDamage() {
+    return damage;
+}
+
+bool & Player::Invulnerable() {
+    return invulnerable;
+}
+
+int & Player::InvulnerabilityPeriod() {
+    return invulnerability_period;
 }
 
 Zombie::Zombie(int x, int y, int symbol, const TCODColor & color, const char * name,
