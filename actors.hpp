@@ -19,6 +19,7 @@ public:
     virtual bool IsWall(int x, int y) = 0;
     virtual bool CanWalk(int x, int y) = 0;
     virtual bool IsInFOV(int x, int y) = 0;
+    virtual bool IsInBounds(int x, int y) = 0;
     virtual void Destroy(int x, int y) = 0;
     virtual Player* GetPlayer() = 0;
     virtual Actor* GetPrincess() = 0;

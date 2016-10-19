@@ -20,6 +20,7 @@ public:
     bool IsWall(int x, int y) override;
     bool CanWalk(int x, int y) override;
     bool IsInFOV(int x, int y) override;
+    bool IsInBounds(int x, int y) override;
     void Destroy(int x, int y) override;
     Player* GetPlayer() override;
     Actor* GetPrincess() override;

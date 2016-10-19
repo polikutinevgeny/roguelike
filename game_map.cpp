@@ -101,6 +101,10 @@ bool Map::IsExplored(int x, int y) {
     return map_[x + y * width].explored;
 }
 
+bool Map::IsInBounds(int x, int y) {
+    return x >= 0 && y >= 0 && x < width && y < height;
+}
+
 void Map::ComputeFOV() {
     static int mult[4][8] = {
         { 1, 0, 0, -1, -1, 0, 0, 1 },

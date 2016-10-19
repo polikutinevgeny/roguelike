@@ -30,6 +30,7 @@ public:
 
     bool IsInFOV(int x, int y);
     bool IsExplored(int x, int y);
+    bool IsInBounds(int x, int y);
     void ComputeFOV();
 
     void Destroy(int x, int y);

@@ -54,7 +54,7 @@ ActorStatus Player::Act(int x, int y) {
         return ActorStatus::NotMoved;
     }
     for (auto a : engine_.GetActors()) {
-        if (a->x == x && a->y == y && a->blocks) {
+        if (a->x == x && a->y == y/* && a->blocks*/) {
             a->Interact(*this);
             return ActorStatus::Moved;
         }
@@ -72,7 +72,9 @@ void Player::Interact(Actor& other) {
 }
 
 void Player::Shoot(int dx, int dy) {
-    engine_.GetActors().push_front(new Projectile(x, y, '@', TCODColor::red, "fireball", engine_, 2, dx, dy));
+    if (engine_.IsInBounds(x + dx, y + dy) && engine_.CanWalk(x + dx, y + dy)) {
+        engine_.GetActors().push_front(new Projectile(x + dx, y + dy, '@', TCODColor::red, "fireball", engine_, 1, dx, dy));
+    }
 }
 
 Zombie::Zombie(int x, int y, int symbol, const TCODColor & color, const char * name,
@@ -144,12 +146,18 @@ void Dragon::Interact(Actor& other) {
 ActorStatus Dragon::Act(int x, int y) {
     int dx = x - this->x;
     int dy = y - this->y;
+    double d = sqrt(dx * dx + dy * dy);
+    dx = (int)std::round(dx / d);
+    dy = (int)std::round(dy / d);
+    TCODRandom* rng = TCODRandom::getInstance();
+    if (rng->getInt(0, 100) < 20 && engine_.IsInFOV(this->x, this->y) && (this->x == x || this->y == y) && 
+        engine_.CanWalk(this->x + dx, this->y + dy)) {
+        engine_.GetActors().push_front(new Projectile(this->x + dx, this->y + dy, '@', TCODColor::red, "fireball", engine_, 1, dx, dy));
+        return ActorStatus::Moved;
+    }
     int sdx = dx > 0 ? 1 : -1;
     int sdy = dy > 0 ? 1 : -1;
-    double d = sqrt(dx * dx + dy * dy);
     if (d > 1) {
-        dx = (int)std::round(dx / d);
-        dy = (int)std::round(dy / d);
         if (engine_.CanWalk(this->x + dx, this->y + dy) && ((dx != 0) != (dy != 0))) {
             this->x += dx;
             this->y += dy;
@@ -224,7 +232,12 @@ Projectile::Projectile(int x, int y, int symbol, const TCODColor & color, const 
 
 void Projectile::Update() {
     for (int i = 0; i < speed; ++i) {
-        Act(x + dx, y + dy);
+        if (engine_.IsInBounds(x + dx, y + dy)) {
+            Act(x + dx, y + dy);
+        }
+        else {
+            remove = true;
+        }
     }
 }
 

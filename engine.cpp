@@ -109,6 +109,7 @@ void rogue::Engine::Update() {
             }
             ++a;
         }
+        actors.remove_if([](Actor* a) { return a->remove; });
         printf("Princess dx: %d, dy %d\n", princess->x - player->x, princess->y - player->y);
     }
 }
@@ -151,6 +152,10 @@ bool Engine::CanWalk(int x, int y) {
 
 bool Engine::IsInFOV(int x, int y) {
     return map->IsInFOV(x, y);
+}
+
+bool Engine::IsInBounds(int x, int y) {
+    return map->IsInBounds(x, y);
 }
 
 void Engine::Destroy(int x, int y) {
