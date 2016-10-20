@@ -19,25 +19,17 @@ const int BASE_DRAGON_DMG = 10;
 const int BASE_PROJECTILE_DMG = 20;
 const int MAX_INVENTORY_SIZE = 10;
 const int FIREBALL_MP_COST = 10;
+const int MP_INCREASE = 1;
 
 }
 
 Actor::Actor(int x, int y, int symbol, const TCODColor & color, const char * name,
     ActorCallbackInterface& engine)
-    : x(x), y(y)
-    , symbol(symbol)
-    , color(color)
-    , name(name)
+    : Drawable(x, y, symbol, color, name)
     , blocks(true)
     , engine_(engine)
-    , remove(false) {
-
-}
-
-void Actor::Render(int mx, int my) {
-    TCODConsole::root->setChar(x + mx, y + my, symbol);
-    TCODConsole::root->setCharForeground(x + mx, y + my, color);
-}
+    , remove(false) 
+{}
 
 Character::Character(int x, int y, int symbol, const TCODColor& color, const char* name,
     ActorCallbackInterface& engine) : Actor(x, y, symbol, color, name, engine) {}
@@ -59,13 +51,14 @@ void Player::Update() {
 }
 
 ActorStatus Player::Act(int x, int y) {
+    if (engine_.IsWall(x, y)) {
+        return ActorStatus::NotMoved;
+    }
     invulnerability_period = std::max(0, invulnerability_period - 1);
     if (invulnerability_period == 0) {
         invulnerable = false;
     }
-    if (engine_.IsWall(x, y)) {
-        return ActorStatus::NotMoved;
-    }
+    mp = std::min(mp + MP_INCREASE, max_mp);
     for (auto l = engine_.GetLoot().begin(); l != engine_.GetLoot().end();) {
         if ((*l)->x == x && (*l)->y == y && inventory.size() < MAX_INVENTORY_SIZE) {
             inventory.push_back(*l);
@@ -107,10 +100,16 @@ void Player::Shoot(int dx, int dy) {
     }
 }
 
-void Player::UseInventory(int n) {
+std::string Player::UseInventory(int n) {
+    if (n >= inventory.size()) {
+        return "";
+    }
     inventory[n]->Use();
-    printf("You used %s potion\n", inventory[n]->name);
+    //printf("You used %s potion\n", inventory[n]->name);
+    std::string message = inventory[n]->name;
+    delete inventory[n];
     inventory.erase(inventory.begin() + n);
+    return message;
 }
 
 int & Player::GetHP() {
@@ -119,6 +118,14 @@ int & Player::GetHP() {
 
 int & Player::GetMaxHP() {
     return max_hp;
+}
+
+int & Player::GetMP() {
+    return mp;
+}
+
+int & Player::GetMaxMP() {
+    return max_mp;
 }
 
 int & Player::GetDamage() {
@@ -145,6 +152,7 @@ void Zombie::Interact(Actor& other) {
     if (hp == 0) {
         blocks = false;
         remove = true;
+        engine_.GetLoot().push_back(CreatePotion(x, y, engine_.GetPlayer(), &engine_));
     }
 }
 
@@ -196,6 +204,7 @@ void Dragon::Interact(Actor& other) {
     if (hp == 0) {
         blocks = false;
         remove = true;
+        engine_.GetLoot().push_back(CreatePotion(x, y, engine_.GetPlayer(), &engine_));
     }
 }
 

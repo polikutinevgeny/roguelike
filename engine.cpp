@@ -6,7 +6,7 @@ namespace rogue {
 namespace {
 
 const int GUI_PANEL_HEIGHT = 7;
-const int GUI_PANEL_WIDTH = 60;
+const int GUI_PANEL_WIDTH = 100;
 
 }
 
@@ -72,7 +72,7 @@ void rogue::Engine::Update() {
         case TCODK_7:
         case TCODK_8:
         case TCODK_9:
-            player->UseInventory(stoi(std::string(1, key.c)));
+            message = player->UseInventory(stoi(std::string(1, key.c)));
             break;
         default:
             switch (key.c) {
@@ -125,6 +125,7 @@ void rogue::Engine::Update() {
         actors.remove_if([](Actor* a) { return a->remove; });
         printf("Princess dx: %d, dy %d\n", princess->x - player->x, princess->y - player->y);
     }
+    
 }
 
 void rogue::Engine::Render() {
@@ -153,7 +154,8 @@ void rogue::Engine::Render() {
             a->Render(0, GUI_PANEL_HEIGHT);
         }
     }
-    gui_->Render();
+    gui_->Render(message);
+    message = "";
 }
 
 void rogue::Engine::Lose() {
@@ -198,6 +200,10 @@ int Engine::GetFOVRadius() {
 
 std::list<Potion*>& Engine::GetLoot() {
     return loot;
+}
+
+void Engine::OpenMap() {
+    map->OpenMap();
 }
 
 void rogue::Engine::Win() {

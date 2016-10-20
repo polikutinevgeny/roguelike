@@ -20,12 +20,13 @@ Gui::~Gui() {
     delete con_;
 }
 
-void Gui::Render() {
+void Gui::Render(std::string message) {
     con_->setDefaultBackground(TCODColor::black);
     con_->clear();
     RenderBar(1, 1, BAR_WIDTH, "HP", engine_.GetPlayer()->hp, engine_.GetPlayer()->max_hp, TCODColor::lightRed, TCODColor::darkerRed);
     RenderBar(1, 3, BAR_WIDTH, "MP", engine_.GetPlayer()->mp, engine_.GetPlayer()->max_mp, TCODColor::lightBlue, TCODColor::darkerBlue);
     RenderInventory(BAR_WIDTH + 2, 1, engine_.GetPlayer()->inventory);
+    con_->print(BAR_WIDTH + 13, 1, message.c_str());
     TCODConsole::blit(con_, 0, 0, main_width_, gui_height_, TCODConsole::root, 0, 0);
 }
 

@@ -15,7 +15,7 @@ public:
     Gui(int gui_width, int gui_height, int main_width, int main_height, GuiCallbackInterface& engine);
     ~Gui();
 
-    void Render();
+    void Render(std::string message);
 
 private:
     int gui_width_, gui_height_;

@@ -3,6 +3,7 @@
 #include <list>
 #include <vector>
 #include "loot.hpp"
+#include "drawable.hpp"
 
 namespace rogue {
 
@@ -14,7 +15,7 @@ enum class ActorStatus {
 class Actor;
 class Player;
 
-class ActorCallbackInterface {
+class ActorCallbackInterface : public PotionMapCallbackInterface{
 public:
     virtual void Win() = 0;
     virtual void Lose() = 0;
@@ -31,23 +32,16 @@ public:
 
 class Character;
 
-class Actor {
+class Actor : public Drawable {
 public:
     Actor(int x, int y, int symbol, const TCODColor& color, const char* name,
         ActorCallbackInterface& engine);
-
-    void Render(int mx, int my);
 
     virtual void Update() = 0;
 
     virtual ActorStatus Act(int x, int y) = 0;
 
     virtual void Interact(Actor& other) = 0;
-
-    int x, y;
-    int symbol;
-    TCODColor color;
-    const char* name;
 
     bool blocks;
 
@@ -67,7 +61,7 @@ public:
     int max_hp;
 };
 
-class Player : public Character, public PlayerInterface {
+class Player : public Character, public PotionPlayerCallbackInterface {
 public:
     Player(int x, int y, int symbol, const TCODColor& color, const char* name,
         ActorCallbackInterface& engine);
@@ -80,10 +74,12 @@ public:
 
     void Shoot(int dx, int dy);
 
-    void UseInventory(int n);
+    std::string UseInventory(int n);
 
     int& GetHP() override;
     int& GetMaxHP() override;
+    int& GetMP() override;
+    int& GetMaxMP() override;
     int& GetDamage() override;
     bool& Invulnerable() override;
     int& InvulnerabilityPeriod() override;

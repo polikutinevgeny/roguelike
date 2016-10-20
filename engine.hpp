@@ -28,6 +28,7 @@ public:
     std::list<Actor*>& GetActors() override;
     int GetFOVRadius() override;
     std::list<Potion*>& GetLoot() override;
+    void OpenMap() override;
 
     std::list<Actor*> actors;
     std::list<Potion*> loot;
@@ -38,6 +39,8 @@ public:
     int fov_radius;
     int width;
     int height;
+
+    std::string message;
 
 private:
     enum class GameStatus {

@@ -1,7 +1,7 @@
 #include "libtcod.hpp"
 #include "game_map.hpp"
 #include "bsp_tree.hpp"
-#include "loot.hpp"
+//#include "loot.hpp"
 
 namespace rogue {
 
@@ -124,6 +124,12 @@ void Map::ComputeFOV() {
     map_[engine_.GetPlayer()->x + engine_.GetPlayer()->y * width].fov = 1;
 }
 
+void Map::OpenMap() {
+    for (int i = 0; i < width * height; ++i) {
+        map_[i].explored = true;
+    }
+}
+
 void Map::Destroy(int x, int y) {
     map_[x + width * y].walkable = true;
     map_[x + width * y].transparent = true;
@@ -178,11 +184,11 @@ void Map::CreateRoom(bool first, int x1, int y1, int x2, int y2) {
             }
             num--;
         }
-        int x = rng->getInt(x1, x2);
+        /*int x = rng->getInt(x1, x2);
         int y = rng->getInt(y1, y2);
         if (CanWalk(x, y)) {
             engine_.GetLoot().push_back(CreatePotion(x, y, engine_.GetPlayer()));
-        }
+        }*/
     }
 }
 

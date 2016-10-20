@@ -34,6 +34,8 @@ public:
     bool IsInBounds(int x, int y);
     void ComputeFOV();
 
+    void OpenMap();
+
     void Destroy(int x, int y);
 
     int width, height;
