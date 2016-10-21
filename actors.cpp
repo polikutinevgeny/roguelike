@@ -105,7 +105,6 @@ std::string Player::UseInventory(int n) {
         return "";
     }
     inventory[n]->Use();
-    //printf("You used %s potion\n", inventory[n]->name);
     std::string message = inventory[n]->name;
     delete inventory[n];
     inventory.erase(inventory.begin() + n);
@@ -152,7 +151,10 @@ void Zombie::Interact(Actor& other) {
     if (hp == 0) {
         blocks = false;
         remove = true;
-        engine_.GetLoot().push_back(CreatePotion(x, y, engine_.GetPlayer(), &engine_));
+        TCODRandom* rng = TCODRandom::getInstance();
+        if (rng->getInt(0, 100) <= 30) {
+            engine_.GetLoot().push_back(CreatePotion(x, y, engine_.GetPlayer(), &engine_));
+        }
     }
 }
 
@@ -203,8 +205,10 @@ void Dragon::Interact(Actor& other) {
     hp = hp - other.damage > 0 ? hp - other.damage : 0;
     if (hp == 0) {
         blocks = false;
-        remove = true;
-        engine_.GetLoot().push_back(CreatePotion(x, y, engine_.GetPlayer(), &engine_));
+        remove = true; TCODRandom* rng = TCODRandom::getInstance();
+        if (rng->getInt(0, 100) <= 30) {
+            engine_.GetLoot().push_back(CreatePotion(x, y, engine_.GetPlayer(), &engine_));
+        }
     }
 }
 

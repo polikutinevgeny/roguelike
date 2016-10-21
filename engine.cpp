@@ -10,7 +10,7 @@ const int GUI_PANEL_WIDTH = 100;
 
 }
 
-rogue::Engine::Engine(int width, int height) 
+Engine::Engine(int width, int height) 
     : fov_radius(10), compute_fov_(true), status_(GameStatus::STARTUP), width(width), height(height)
 {
     ShufflePotions();
@@ -24,7 +24,7 @@ rogue::Engine::Engine(int width, int height)
     gui_ = new Gui(GUI_PANEL_WIDTH, GUI_PANEL_HEIGHT, width, height, *this);
 }
 
-rogue::Engine::~Engine() {
+Engine::~Engine() {
     for (auto a : actors) {
         delete a;
     }
@@ -32,7 +32,7 @@ rogue::Engine::~Engine() {
     delete gui_;
 }
 
-void rogue::Engine::Update() {
+void Engine::Update() {
     TCOD_key_t key;
     if (status_ == GameStatus::STARTUP) {
         map->ComputeFOV();
@@ -107,9 +107,6 @@ void rogue::Engine::Update() {
     }
     if (status_ == GameStatus::NEW_TURN) {
         for (auto a = actors.begin(); a != actors.end();) {
-            if ((*a)->name == "fireball") {
-                printf("hello\n");
-            }
             if (*a != player) {
                 (*a)->Update();
                 if ((*a)->remove) {
@@ -128,7 +125,7 @@ void rogue::Engine::Update() {
     
 }
 
-void rogue::Engine::Render() {
+void Engine::Render() {
     TCODConsole::root->clear();
     if (status_ == GameStatus::VICTORY) {
         TCODConsole::root->printEx(width / 2, height / 2, TCOD_BKGND_NONE, TCOD_CENTER, "YOU WON");
@@ -158,7 +155,7 @@ void rogue::Engine::Render() {
     message = "";
 }
 
-void rogue::Engine::Lose() {
+void Engine::Lose() {
     status_ = GameStatus::DEFEAT;
 }
 
