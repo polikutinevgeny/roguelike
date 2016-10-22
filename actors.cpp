@@ -46,6 +46,12 @@ Player::Player(int x, int y, int symbol, const TCODColor& color, const char* nam
     damage = BASE_PLAYER_DMG;
 }
 
+Player::~Player() {
+    for (auto l : inventory) {
+        delete l;
+    }
+}
+
 void Player::Update() {
     //No AI - no update
 }
@@ -291,10 +297,10 @@ void Princess::Interact(Actor& other) {
     engine_.Win();
 }
 
-Projectile::Projectile(int x, int y, int symbol, const TCODColor & color, const char * name, ActorCallbackInterface & engine, int speed, int dx, int dy) :
-    Actor(x, y, symbol, color, name, engine)
-    , speed(speed)
-    , dx(dx), dy(dy) {
+Projectile::Projectile(int x, int y, int symbol, const TCODColor & color, const char * name, ActorCallbackInterface & engine, int speed, int dx, int dy) 
+        : Actor(x, y, symbol, color, name, engine)
+        , speed(speed)
+        , dx(dx), dy(dy) {
     blocks = false;
     damage = BASE_PROJECTILE_DMG;
 }
@@ -313,7 +319,10 @@ void Projectile::Update() {
 ActorStatus Projectile::Act(int x, int y) {
     if (engine_.IsWall(x, y)) {
         remove = true;
-        engine_.Destroy(x, y);
+        TCODRandom* rng = TCODRandom::getInstance();
+        if (rng->getInt(0, 100) <= 20) {
+            engine_.Destroy(x, y);
+        }
         return ActorStatus::NotMoved;
     }
     for (auto a : engine_.GetActors()) {

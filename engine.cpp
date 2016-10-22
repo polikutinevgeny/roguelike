@@ -28,6 +28,9 @@ Engine::~Engine() {
     for (auto a : actors) {
         delete a;
     }
+    for (auto l : loot) {
+        delete l;
+    }
     delete map;
     delete gui_;
 }
@@ -110,6 +113,7 @@ void Engine::Update() {
             if (*a != player) {
                 (*a)->Update();
                 if ((*a)->remove) {
+                    delete *a;
                     a = actors.erase(a);
                 }
                 else {
@@ -119,7 +123,7 @@ void Engine::Update() {
             }
             ++a;
         }
-        actors.remove_if([](Actor* a) { return a->remove; });
+        actors.remove_if([](Actor* a) {if (a->remove) { delete a; return true; } return false; });
         printf("Princess dx: %d, dy %d\n", princess->x - player->x, princess->y - player->y);
     }
     

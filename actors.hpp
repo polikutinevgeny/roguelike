@@ -65,6 +65,7 @@ class Player : public Character, public PotionPlayerCallbackInterface {
 public:
     Player(int x, int y, int symbol, const TCODColor& color, const char* name,
         ActorCallbackInterface& engine);
+    ~Player();
 
     void Update() override;
 
