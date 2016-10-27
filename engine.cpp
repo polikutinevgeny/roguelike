@@ -1,12 +1,13 @@
 #include "libtcod.hpp"
 #include "engine.hpp"
+#include "config.hpp"
 
 namespace rogue {
 
 namespace {
 
-const int GUI_PANEL_HEIGHT = 7;
-const int GUI_PANEL_WIDTH = 100;
+const int GUI_PANEL_HEIGHT = GetConfigValue("GUI_PANEL_HEIGHT");
+const int GUI_PANEL_WIDTH = GetConfigValue("GUI_PANEL_WIDTH");
 
 }
 

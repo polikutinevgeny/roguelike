@@ -1,11 +1,12 @@
 #include "gui.hpp"
 #include <string>
+#include "config.hpp"
 
 namespace rogue {
 
 namespace {
 
-const int BAR_WIDTH = 40;
+const int BAR_WIDTH = GetConfigValue("BAR_WIDTH");
 
 }
 

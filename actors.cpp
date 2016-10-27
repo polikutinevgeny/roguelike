@@ -3,23 +3,24 @@
 #include <stdio.h>
 #include <cmath>
 #include <algorithm>
+#include "config.hpp"
 
 namespace rogue {
 
 namespace {
 
-const int TRACKING_TURNS = 3;
-const int BASE_PLAYER_HP = 10000;
-const int BASE_PLAYER_DMG = 100;
-const int BASE_PLAYER_MP = 10000;
-const int BASE_ZOMBIE_HP = 20;
-const int BASE_ZOMBIE_DMG = 5;
-const int BASE_DRAGON_HP = 40;
-const int BASE_DRAGON_DMG = 10;
-const int BASE_PROJECTILE_DMG = 20;
-const int MAX_INVENTORY_SIZE = 10;
-const int FIREBALL_MP_COST = 10;
-const int MP_INCREASE = 1;
+const int TRACKING_TURNS = GetConfigValue("TRACKING_TURNS");
+const int BASE_PLAYER_HP = GetConfigValue("BASE_PLAYER_HP");
+const int BASE_PLAYER_DMG = GetConfigValue("BASE_PLAYER_DMG");
+const int BASE_PLAYER_MP = GetConfigValue("BASE_PLAYER_MP");
+const int BASE_ZOMBIE_HP = GetConfigValue("BASE_ZOMBIE_HP");
+const int BASE_ZOMBIE_DMG = GetConfigValue("BASE_ZOMBIE_DMG");
+const int BASE_DRAGON_HP = GetConfigValue("BASE_DRAGON_HP");
+const int BASE_DRAGON_DMG = GetConfigValue("BASE_DRAGON_DMG");
+const int BASE_PROJECTILE_DMG = GetConfigValue("BASE_PROJECTILE_DMG");
+const int MAX_INVENTORY_SIZE = GetConfigValue("MAX_INVENTORY_SIZE");
+const int FIREBALL_MP_COST = GetConfigValue("FIREBALL_MP_COST");
+const int MP_INCREASE = GetConfigValue("MP_INCREASE");
 
 }
 

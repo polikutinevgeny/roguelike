@@ -2,6 +2,7 @@
 #include "game_map.hpp"
 #include "bsp_tree.hpp"
 //#include "loot.hpp"
+#include "config.hpp"
 
 namespace rogue {
 
@@ -9,9 +10,9 @@ namespace {
 
 int last_x1, last_y1, last_x2, last_y2;
 
-const int MAX_ROOM_MONSTERS = 3;
-const int MIN_ROOM_VERT_SIZE = 6;
-const int MIN_ROOM_HORIZ_SIZE = 12;
+const int MAX_ROOM_MONSTERS = GetConfigValue("MAX_ROOM_MONSTERS");
+const int MIN_ROOM_VERT_SIZE = GetConfigValue("MIN_ROOM_VERT_SIZE");
+const int MIN_ROOM_HORIZ_SIZE = GetConfigValue("MIN_ROOM_HORIZ_SIZE");
 
 }
 

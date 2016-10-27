@@ -1,17 +1,18 @@
 #include "loot.hpp"
 #include <algorithm>
 #include <ctime>
+#include "config.hpp"
 
 namespace rogue {
 
 namespace {
 
-const int MAX_HEALTH_POTION_HP = 50;
-const int HEALING_POTION_HP = 100;
-const int MAX_MANA_POTION_MP = 50;
-const int MANA_POTION_MP = 100;
-const int DAMAGE_POTION_DMG = 10;
-const int INVULNERABILITY_DUR = 20;
+const int MAX_HEALTH_POTION_HP = GetConfigValue("MAX_HEALTH_POTION_HP");
+const int HEALING_POTION_HP = GetConfigValue("HEALING_POTION_HP");
+const int MAX_MANA_POTION_MP = GetConfigValue("MAX_MANA_POTION_MP");
+const int MANA_POTION_MP = GetConfigValue("MANA_POTION_MP");
+const int DAMAGE_POTION_DMG = GetConfigValue("DAMAGE_POTION_DMG");
+const int INVULNERABILITY_DUR = GetConfigValue("INVULNERABILITY_DUR");
 
 enum PotionType {
     MAX_HP = 0,
