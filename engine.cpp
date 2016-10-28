@@ -1,6 +1,7 @@
 #include "libtcod.hpp"
 #include "engine.hpp"
 #include "config.hpp"
+#include "color.hpp"
 
 namespace rogue {
 
@@ -8,6 +9,9 @@ namespace {
 
 const int GUI_PANEL_HEIGHT = GetConfigValue("GUI_PANEL_HEIGHT");
 const int GUI_PANEL_WIDTH = GetConfigValue("GUI_PANEL_WIDTH");
+
+const Color PLAYER_COLOR(GetConfigValue("PLAYER_COLOR"));
+const Color PRINCESS_COLOR(GetConfigValue("PRINCESS_COLOR"));
 
 }
 
@@ -17,8 +21,8 @@ Engine::Engine(int width, int height)
     ShufflePotions();
     TCODConsole::setCustomFont("terminal.png", TCOD_FONT_LAYOUT_TCOD | TCOD_FONT_TYPE_GREYSCALE, 32, 8);
     TCODConsole::initRoot(width, height, "Rogue-like game", false);
-    player = new Player(40, 25, 'K', TCODColor::white, "player", *this);
-    princess = new Princess(40, 30, 'P', TCODColor::darkerGrey, "princess", *this);
+    player = new Player(40, 25, 'K', PLAYER_COLOR, "player", *this);
+    princess = new Princess(40, 30, 'P', PRINCESS_COLOR, "princess", *this);
     actors.push_back(player);
     actors.push_back(princess);
     map = new Map(width, height - GUI_PANEL_HEIGHT, *this, *this);

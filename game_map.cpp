@@ -1,8 +1,8 @@
 #include "libtcod.hpp"
 #include "game_map.hpp"
 #include "bsp_tree.hpp"
-//#include "loot.hpp"
 #include "config.hpp"
+#include "color.hpp"
 
 namespace rogue {
 
@@ -13,6 +13,13 @@ int last_x1, last_y1, last_x2, last_y2;
 const int MAX_ROOM_MONSTERS = GetConfigValue("MAX_ROOM_MONSTERS");
 const int MIN_ROOM_VERT_SIZE = GetConfigValue("MIN_ROOM_VERT_SIZE");
 const int MIN_ROOM_HORIZ_SIZE = GetConfigValue("MIN_ROOM_HORIZ_SIZE");
+
+const Color WALL_COLOR(GetConfigValue("WALL_COLOR"));
+const Color GROUND_COLOR(GetConfigValue("GROUND_COLOR"));
+const Color VIEWED_WALL_COLOR(GetConfigValue("VIEWED_WALL_COLOR"));
+const Color VIEWED_GROUND_COLOR(GetConfigValue("VIEWED_GROUND_COLOR"));
+const Color ZOMBIE_COLOR(GetConfigValue("ZOMBIE_COLOR"));
+const Color DRAGON_COLOR(GetConfigValue("DRAGON_COLOR"));
 
 }
 
@@ -73,19 +80,15 @@ bool Map::CanWalk(int x, int y) {
 }
 
 void Map::Render(int mx, int my) {
-    static const TCODColor wall(0, 0, 100);
-    static const TCODColor ground(50, 50, 150);
-    static const TCODColor light_wall(130, 110, 50);
-    static const TCODColor light_ground(200, 180, 50);
     for (int x = 0; x < width; ++x) {
         for (int y = 0; y < height; ++y) {
             if (IsInFOV(x, y)) {
                 TCODConsole::root->setCharBackground(x + mx, y + my,
-                    IsWall(x, y) ? light_wall : light_ground);
+                    IsWall(x, y) ? VIEWED_WALL_COLOR : VIEWED_GROUND_COLOR);
             }
             else if (IsExplored(x, y)) {
                 TCODConsole::root->setCharBackground(x + mx, y + my,
-                    IsWall(x, y) ? wall : ground);
+                    IsWall(x, y) ? WALL_COLOR : GROUND_COLOR);
             }
         }
     }
@@ -141,11 +144,11 @@ void Map::PutMonster(int x, int y) {
     TCODRandom* rng = TCODRandom::getInstance();
     if (rng->getInt(0, 100) < 80) {
         engine_.GetActors().push_back(new Zombie(
-            x, y, 'Z', TCODColor::darkerGreen, "zombie", actor_callback_));
+            x, y, 'Z', ZOMBIE_COLOR, "zombie", actor_callback_));
     }
     else {
         engine_.GetActors().push_back(new Dragon(
-            x, y, 'D', TCODColor::red, "dragon", actor_callback_));
+            x, y, 'D', DRAGON_COLOR, "dragon", actor_callback_));
     }
 }
 

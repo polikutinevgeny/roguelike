@@ -11,7 +11,7 @@ const char CONFIG_FILE[] = "config.cfg";
 
 }
 
-int GetConfigValue(const std::string name) {
+int GetConfigValue(const std::string& name) {
     static std::unordered_map<std::string, int> config;
     static bool initialized = false;
     if (!initialized) {
@@ -24,7 +24,7 @@ int GetConfigValue(const std::string name) {
             if (std::getline(line, key, '=')) {
                 std::string value;
                 if (std::getline(line, value)) {
-                    config[key] = std::stoi(value);
+                    config[key] = std::stoi(value, 0, 0);
                 }
             }
         }

@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClCompile Include="actors.cpp" />
     <ClCompile Include="bsp_tree.cpp" />
+    <ClCompile Include="color.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="drawable.cpp" />
     <ClCompile Include="engine.cpp" />
@@ -165,12 +166,16 @@
   <ItemGroup>
     <ClInclude Include="actors.hpp" />
     <ClInclude Include="bsp_tree.hpp" />
+    <ClInclude Include="color.hpp" />
     <ClInclude Include="config.hpp" />
     <ClInclude Include="drawable.hpp" />
     <ClInclude Include="engine.hpp" />
     <ClInclude Include="game_map.hpp" />
     <ClInclude Include="gui.hpp" />
     <ClInclude Include="loot.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="config.cfg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

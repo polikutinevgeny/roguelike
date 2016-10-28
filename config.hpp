@@ -3,6 +3,6 @@
 
 namespace rogue {
 
-int GetConfigValue(const std::string name);
+int GetConfigValue(const std::string& name);
 
 }
