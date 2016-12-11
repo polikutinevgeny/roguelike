@@ -24,6 +24,7 @@ const int FIREBALL_MP_COST = GetConfigValue("FIREBALL_MP_COST");
 const int MP_INCREASE = GetConfigValue("MP_INCREASE");
 
 const Color FIREBALL_COLOR(GetConfigValue("FIREBALL_COLOR"));
+const int FIREBALL_SYM = GetConfigValue("FIREBALL_SYM");
 
 
 }
@@ -106,7 +107,7 @@ void Player::Shoot(int dx, int dy) {
         invulnerable = false;
     }
     if (engine_.IsInBounds(x + dx, y + dy) && engine_.CanWalk(x + dx, y + dy) && mp >= FIREBALL_MP_COST) {
-        engine_.GetActors().push_front(new Projectile(x + dx, y + dy, '@', FIREBALL_COLOR, "fireball", engine_, 1, dx, dy));
+        engine_.GetActors().push_front(new Projectile(x + dx, y + dy, FIREBALL_SYM, FIREBALL_COLOR, "fireball", engine_, 1, dx, dy));
         mp -= FIREBALL_MP_COST;
     }
 }
@@ -232,7 +233,7 @@ ActorStatus Dragon::Act(int x, int y) {
     TCODRandom* rng = TCODRandom::getInstance();
     if (rng->getInt(0, 100) < 20 && engine_.IsInFOV(this->x, this->y) && (this->x == x || this->y == y) && 
         engine_.CanWalk(this->x + dx, this->y + dy)) {
-        engine_.GetActors().push_front(new Projectile(this->x + dx, this->y + dy, '@', FIREBALL_COLOR, "fireball", engine_, 1, dx, dy));
+        engine_.GetActors().push_front(new Projectile(this->x + dx, this->y + dy, FIREBALL_SYM, FIREBALL_COLOR, "fireball", engine_, 1, dx, dy));
         return ActorStatus::Moved;
     }
     int sdx = dx > 0 ? 1 : -1;

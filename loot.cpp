@@ -14,6 +14,8 @@ const int MANA_POTION_MP = GetConfigValue("MANA_POTION_MP");
 const int DAMAGE_POTION_DMG = GetConfigValue("DAMAGE_POTION_DMG");
 const int INVULNERABILITY_DUR = GetConfigValue("INVULNERABILITY_DUR");
 
+const int POTION_SYM = GetConfigValue("POTION_SYM");
+
 enum PotionType {
     MAX_HP = 0,
     DMG = 1,
@@ -70,25 +72,25 @@ Potion* CreatePotion(int x, int y, PotionPlayerCallbackInterface * player, Potio
     TCODRandom* rng = TCODRandom::getInstance();
     switch (PotionType(rng->getInt(0, pot_num - 1))) {
         case MAX_HP:
-            return new MaxHealthPotion(x, y, '!', potion_colors[0], "Max health increased", player, map);
+            return new MaxHealthPotion(x, y, POTION_SYM, potion_colors[0], "Max health increased", player, map);
             break;
         case DMG:
-            return new DamagePotion(x, y, '!', potion_colors[1], "Damage increased", player, map);
+            return new DamagePotion(x, y, POTION_SYM, potion_colors[1], "Damage increased", player, map);
             break;
         case INVULNR:
-            return new InvulnerabilityPotion(x, y, '!', potion_colors[2], "Invulnerability granted", player, map);
+            return new InvulnerabilityPotion(x, y, POTION_SYM, potion_colors[2], "Invulnerability granted", player, map);
             break;
         case HEALING:
-            return new HealingPotion(x, y, '!', potion_colors[3], "Healed", player, map);
+            return new HealingPotion(x, y, POTION_SYM, potion_colors[3], "Healed", player, map);
             break;
         case MAX_MP:
-            return new MaxManaPotion(x, y, '!', potion_colors[4], "Max mana increased", player, map);
+            return new MaxManaPotion(x, y, POTION_SYM, potion_colors[4], "Max mana increased", player, map);
             break;
         case MANA:
-            return new ManaPotion(x, y, '!', potion_colors[5], "Mana refilled", player, map);
+            return new ManaPotion(x, y, POTION_SYM, potion_colors[5], "Mana refilled", player, map);
             break;
         case MAP:
-            return new RevealMapPotion(x, y, '!', potion_colors[6], "Knowledge flows into your head", player, map);
+            return new RevealMapPotion(x, y, POTION_SYM, potion_colors[6], "Knowledge flows into your head", player, map);
             break;
         default:
             return NULL;

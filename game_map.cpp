@@ -21,6 +21,9 @@ const Color VIEWED_GROUND_COLOR(GetConfigValue("VIEWED_GROUND_COLOR"));
 const Color ZOMBIE_COLOR(GetConfigValue("ZOMBIE_COLOR"));
 const Color DRAGON_COLOR(GetConfigValue("DRAGON_COLOR"));
 
+const int ZOMBIE_SYM = GetConfigValue("ZOMBIE_SYM");
+const int DRAGON_SYM = GetConfigValue("DRAGON_SYM");
+
 }
 
 class BSPListener : public BSPTreeCallbackInterface {
@@ -144,11 +147,11 @@ void Map::PutMonster(int x, int y) {
     TCODRandom* rng = TCODRandom::getInstance();
     if (rng->getInt(0, 100) < 80) {
         engine_.GetActors().push_back(new Zombie(
-            x, y, 'Z', ZOMBIE_COLOR, "zombie", actor_callback_));
+            x, y, ZOMBIE_SYM, ZOMBIE_COLOR, "zombie", actor_callback_));
     }
     else {
         engine_.GetActors().push_back(new Dragon(
-            x, y, 'D', DRAGON_COLOR, "dragon", actor_callback_));
+            x, y, DRAGON_SYM, DRAGON_COLOR, "dragon", actor_callback_));
     }
 }
 
